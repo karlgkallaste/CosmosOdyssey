@@ -1,4 +1,4 @@
-﻿namespace CosmosOdyssey.Domain;
+﻿namespace CosmosOdyssey.Domain.Features.PriceLists;
 
 public class PriceList
 {
