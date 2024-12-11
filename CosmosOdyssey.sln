@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CosmosOdyssey.App", "CosmosOdyssey.App\CosmosOdyssey.App.csproj", "{C0772C1E-3E8B-4DF6-AF1E-35D088B5A5E9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CosmosOdyssey.Domain", "CosmosOdyssey.Domain\CosmosOdyssey.Domain.csproj", "{FE69C4E5-ED59-4012-BE1D-53A6F75A1911}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{C0772C1E-3E8B-4DF6-AF1E-35D088B5A5E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C0772C1E-3E8B-4DF6-AF1E-35D088B5A5E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C0772C1E-3E8B-4DF6-AF1E-35D088B5A5E9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE69C4E5-ED59-4012-BE1D-53A6F75A1911}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE69C4E5-ED59-4012-BE1D-53A6F75A1911}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE69C4E5-ED59-4012-BE1D-53A6F75A1911}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE69C4E5-ED59-4012-BE1D-53A6F75A1911}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
