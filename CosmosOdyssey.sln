@@ -6,6 +6,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CosmosOdyssey.Domain", "Cos
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CosmosOdyssey.Data", "CosmosOdyssey.Data\CosmosOdyssey.Data.csproj", "{48FC3BA1-C2C9-4210-B7D9-C58061D3849E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CosmosOdyssey.Services", "CosmosOdyssey.Services\CosmosOdyssey.Services.csproj", "{46259BB0-A3D7-46B5-8E8A-0F73865E5F37}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CosmosOdyssey.Services.Tests", "CosmosOdyssey.Services.Tests\CosmosOdyssey.Services.Tests.csproj", "{2429BA6D-32AD-44CF-93A2-44676D133C00}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CosmosOdyssey.Domain.Tests", "CosmosOdyssey.Domain.Tests\CosmosOdyssey.Domain.Tests.csproj", "{EC9DAFCA-0B1E-4237-96D3-D970DBD2A737}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CosmosOdyssey.Data.Tests", "CosmosOdyssey.Data.Tests\CosmosOdyssey.Data.Tests.csproj", "{028D2CFE-9115-4402-94F4-A9B0D600CA51}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +32,21 @@ Global
 		{48FC3BA1-C2C9-4210-B7D9-C58061D3849E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{48FC3BA1-C2C9-4210-B7D9-C58061D3849E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{48FC3BA1-C2C9-4210-B7D9-C58061D3849E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{46259BB0-A3D7-46B5-8E8A-0F73865E5F37}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{46259BB0-A3D7-46B5-8E8A-0F73865E5F37}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{46259BB0-A3D7-46B5-8E8A-0F73865E5F37}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{46259BB0-A3D7-46B5-8E8A-0F73865E5F37}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2429BA6D-32AD-44CF-93A2-44676D133C00}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2429BA6D-32AD-44CF-93A2-44676D133C00}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2429BA6D-32AD-44CF-93A2-44676D133C00}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2429BA6D-32AD-44CF-93A2-44676D133C00}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC9DAFCA-0B1E-4237-96D3-D970DBD2A737}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC9DAFCA-0B1E-4237-96D3-D970DBD2A737}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC9DAFCA-0B1E-4237-96D3-D970DBD2A737}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC9DAFCA-0B1E-4237-96D3-D970DBD2A737}.Release|Any CPU.Build.0 = Release|Any CPU
+		{028D2CFE-9115-4402-94F4-A9B0D600CA51}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{028D2CFE-9115-4402-94F4-A9B0D600CA51}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{028D2CFE-9115-4402-94F4-A9B0D600CA51}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{028D2CFE-9115-4402-94F4-A9B0D600CA51}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

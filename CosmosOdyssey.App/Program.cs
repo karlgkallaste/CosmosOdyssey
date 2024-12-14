@@ -1,4 +1,5 @@
 using CosmosOdyssey.Data;
+using CosmosOdyssey.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,6 +13,10 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Move to .Services
+builder.Services.Configure<ApiSettings>(
+    builder.Configuration.GetSection("MyOptions"));
 
 var app = builder.Build();
 
