@@ -21,6 +21,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\CosmosOdyssey.Data\CosmosOdyssey.Data.csproj" />
+      <ProjectReference Include="..\CosmosOdyssey.Services\CosmosOdyssey.Services.csproj" />
     </ItemGroup>
 
 </Project>
