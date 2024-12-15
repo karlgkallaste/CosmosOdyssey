@@ -25,7 +25,8 @@ public class LegRouteInfoResponseModel
 
     public LegRoute ToDomainObject()
     {
-        return LegRoute.CreateFromResponse(Id, RouteLocation.CreateFromResponse(From.Id, From.Name), RouteLocation.CreateFromResponse(To.Id, To.Name), Distance);
+        return LegRoute.Create(Id, RouteLocation.Create(From.Id, From.Name), RouteLocation.Create(To.Id, To.Name),
+            Distance);
     }
 }
 
@@ -45,7 +46,8 @@ public class LegProviderResponseModel
 
     public LegProvider ToDomainObject()
     {
-        return LegProvider.CreateFromResponse(Id, Domain.Features.PriceLists.Company.CreateFromResponse(Company.Id, Company.Name), Price, FlightStart, FlightEnd );
+        return LegProvider.Create(Id, Domain.Features.PriceLists.Company.Create(Company.Id, Company.Name), Price,
+            FlightStart, FlightEnd);
     }
 }
 

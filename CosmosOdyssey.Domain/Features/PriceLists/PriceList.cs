@@ -1,13 +1,10 @@
-﻿using System.Collections.Immutable;
-
-namespace CosmosOdyssey.Domain.Features.PriceLists;
+﻿namespace CosmosOdyssey.Domain.Features.PriceLists;
 
 public record PriceList
 {
     public Guid Id { get; private set; }
     public DateTimeOffset ValidUntil { get; private set; }
-
-    public ImmutableList<PriceListLeg> Legs { get; private set; } = ImmutableList<PriceListLeg>.Empty;
+    public ICollection<PriceListLeg> Legs { get; private set; } = new List<PriceListLeg>();
 
 
     public interface IBuilder
@@ -16,8 +13,8 @@ public record PriceList
         IBuilder WithValidUntil(DateTimeOffset validUntil);
         IBuilder WithLegs(params PriceListLeg[] legs);
         PriceList Build();
-        
     }
+
     public class Builder : IBuilder
     {
         private PriceList _priceList = new PriceList();
@@ -36,7 +33,7 @@ public record PriceList
 
         public IBuilder WithLegs(params PriceListLeg[] legs)
         {
-            _priceList.Legs = legs.ToImmutableList();
+            _priceList.Legs = legs.ToList();
             return this;
         }
 

@@ -6,5 +6,6 @@ public interface IPriceListRepository
 {
     Task<Result> AddAsync(PriceList priceList);
     Task<Result<PriceList>> GetByIdAsync(Guid id);
+    Task<Result<PriceList>> GetLatest();
 }
 

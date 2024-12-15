@@ -1,23 +1,28 @@
+using CosmosOdyssey.App.TestData;
 using CosmosOdyssey.Data;
+using CosmosOdyssey.Domain;
 using CosmosOdyssey.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
 builder.Services.AddOpenApiDocument();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Move to .Services
 builder.Services.Configure<ApiSettings>(
     builder.Configuration.GetSection("MyOptions"));
+
+builder.Services.AddMediatR(x => x.RegisterServicesFromAssembly(typeof(Program).Assembly));
+builder.Services.AddTransient<TestDataSeed>();
+
+builder.Services
+    .RegisterDomainServices()
+    .RegisterDataServices();
 
 var app = builder.Build();
 
@@ -26,6 +31,9 @@ if (app.Environment.IsDevelopment())
 {
     app.UseOpenApi();
     app.UseSwaggerUI();
+    using var scope = app.Services.CreateScope();
+    var dataSeeder = scope.ServiceProvider.GetRequiredService<TestDataSeed>();
+    await dataSeeder.SeedAsync();
 }
 
 app.UseHttpsRedirection();
