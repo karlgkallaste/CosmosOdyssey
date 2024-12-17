@@ -2,6 +2,6 @@
 
 public class FareListFiltersModel
 {
-    public LocationModel[] From { get; set; }
-    public LocationModel[] To { get; set; }
+    public LocationModel[] Locations { get; set; } = [];
+    public CompanyModel[] Companies { get; set; } = [];
 }

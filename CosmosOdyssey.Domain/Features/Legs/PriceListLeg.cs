@@ -1,17 +1,19 @@
-﻿namespace CosmosOdyssey.Domain.Features.PriceLists;
+﻿using CosmosOdyssey.Domain.Features.PriceLists;
+using CosmosOdyssey.Domain.Features.Routes;
 
-public class PriceListLeg
+namespace CosmosOdyssey.Domain.Features.Legs;
+
+public class PriceListLeg : IEntity
 {
     public Guid Id { get; private set; }
-    public Guid PriceListId { get; private set; }
-    public ICollection<LegRoute> Routes { get; private set; } = null!;
-    public ICollection<LegProvider> Providers { get; private set; } = null!;
+    public LegRoute Route { get;  private set; }
+    public List<LegProvider> Providers { get; private set; } = new List<LegProvider>();
 
 
     public interface IBuilder
     {
         IBuilder WithId(Guid id);
-        IBuilder WithRoutes(params LegRoute[] routes);
+        IBuilder WithRoute(LegRoute route);
         IBuilder WithProviders(params LegProvider[] routes);
         PriceListLeg Build();
     }
@@ -26,9 +28,9 @@ public class PriceListLeg
             return this;
         }
 
-        public IBuilder WithRoutes(params LegRoute[] routes)
+        public IBuilder WithRoute(LegRoute route)
         {
-            _priceListLeg.Routes = routes.ToList();
+            _priceListLeg.Route = route;
             return this;
         }
 

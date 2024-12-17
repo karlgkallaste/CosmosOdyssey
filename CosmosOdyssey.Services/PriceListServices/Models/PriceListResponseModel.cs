@@ -1,58 +1,90 @@
-﻿using CosmosOdyssey.Domain.Features.PriceLists;
+﻿using CosmosOdyssey.Domain.Features.Legs;
+using CosmosOdyssey.Domain.Features.Routes;
+using Newtonsoft.Json;
 
 namespace CosmosOdyssey.Services.PriceListServices.Models;
 
-public class PriceListResponseModel
+public class CompanyResponseModel
 {
+    [JsonProperty("id")]
     public Guid Id { get; set; }
-    public DateTimeOffset ValidUntil { get; set; }
-    public PriceListLegResponseModel[] Legs { get; set; } = null!;
+
+    [JsonProperty("name")]
+    public string Name { get; set; }
 }
 
-public class PriceListLegResponseModel
+public class LocationResponseModel
 {
+    [JsonProperty("id")]
     public Guid Id { get; set; }
-    public LegRouteInfoResponseModel[] RouteInfo { get; set; } = null!;
-    public LegProviderResponseModel[] Providers { get; set; } = null!;
+
+    [JsonProperty("name")]
+    public string Name { get; set; }
 }
 
-public class LegRouteInfoResponseModel
+public class LegResponseModel
 {
+    [JsonProperty("id")]
     public Guid Id { get; set; }
-    public RouteLocationResponseModel From { get; set; } = null!;
-    public RouteLocationResponseModel To { get; set; } = null!;
-    public double Distance { get; set; }
 
-    public LegRoute ToDomainObject()
-    {
-        return LegRoute.Create(Id, RouteLocation.Create(From.Id, From.Name), RouteLocation.Create(To.Id, To.Name),
-            Distance);
-    }
+    [JsonProperty("routeInfo")]
+    public RouteInfoResponseModel RouteInfo { get; set; }
+
+    [JsonProperty("providers")]
+    public List<ProviderResponseModel> Providers { get; set; }
 }
 
-public class RouteLocationResponseModel
+public class ProviderResponseModel
 {
+    [JsonProperty("id")]
     public Guid Id { get; set; }
-    public string Name { get; set; } = null!;
-}
 
-public class LegProviderResponseModel
-{
-    public Guid Id { get; set; }
-    public ProviderCompanyResponseModel Company { get; set; } = null!;
+    [JsonProperty("company")]
+    public CompanyResponseModel Company { get; set; }
+
+    [JsonProperty("price")]
     public double Price { get; set; }
+
+    [JsonProperty("flightStart")]
     public DateTime FlightStart { get; set; }
+
+    [JsonProperty("flightEnd")]
     public DateTime FlightEnd { get; set; }
 
     public LegProvider ToDomainObject()
     {
-        return LegProvider.Create(Id, Domain.Features.PriceLists.Company.Create(Company.Id, Company.Name), Price,
-            FlightStart, FlightEnd);
+        return LegProvider.Create(Id, Domain.Features.Companies.Company.Create(Company.Id, Company.Name), Price, FlightStart, FlightEnd);
     }
 }
 
-public class ProviderCompanyResponseModel
+public class PriceListResponseModel
 {
+    [JsonProperty("id")]
     public Guid Id { get; set; }
-    public string Name { get; set; } = null!;
+
+    [JsonProperty("validUntil")]
+    public DateTime ValidUntil { get; set; }
+
+    [JsonProperty("legs")]
+    public List<LegResponseModel> Legs { get; set; }
+}
+
+public class RouteInfoResponseModel
+{
+    [JsonProperty("id")]
+    public Guid Id { get; set; }
+
+    [JsonProperty("from")]
+    public LocationResponseModel From { get; set; }
+
+    [JsonProperty("to")]
+    public LocationResponseModel To { get; set; }
+
+    [JsonProperty("distance")]
+    public double Distance { get; set; }
+
+    public LegRoute ToDomainObject()
+    {
+        return LegRoute.Create(Id, RouteLocation.Create(From.Id, From.Name), RouteLocation.Create(To.Id, To.Name), Distance);
+    }
 }

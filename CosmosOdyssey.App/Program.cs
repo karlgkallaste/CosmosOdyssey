@@ -1,7 +1,9 @@
-using CosmosOdyssey.App.TestData;
+using CosmosOdyssey.App.Features.Fares.Models;
 using CosmosOdyssey.Data;
 using CosmosOdyssey.Domain;
 using CosmosOdyssey.Services;
+using CosmosOdyssey.Services.PriceListServices;
+using Hangfire;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,15 +16,14 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.Configure<ApiSettings>(
-    builder.Configuration.GetSection("MyOptions"));
-
 builder.Services.AddMediatR(x => x.RegisterServicesFromAssembly(typeof(Program).Assembly));
-builder.Services.AddTransient<TestDataSeed>();
+
+builder.Services.AddTransient<ILegInfoProvider, LegInfoProvider>();
 
 builder.Services
     .RegisterDomainServices()
-    .RegisterDataServices();
+    .RegisterDataServices()
+    .RegisterServicesServices();
 
 var app = builder.Build();
 
@@ -31,13 +32,17 @@ if (app.Environment.IsDevelopment())
 {
     app.UseOpenApi();
     app.UseSwaggerUI();
-    using var scope = app.Services.CreateScope();
-    var dataSeeder = scope.ServiceProvider.GetRequiredService<TestDataSeed>();
-    await dataSeeder.SeedAsync();
 }
 
+app.UseHangfireDashboard();
 app.UseHttpsRedirection();
 
+
+using (var scope = app.Services.CreateScope())
+{
+    var priceListService = scope.ServiceProvider.GetRequiredService<IPriceListService>();
+    BackgroundJob.Schedule(() => priceListService.GetLatestPriceList(), TimeSpan.FromSeconds(10));
+}
 app.UseAuthorization();
 
 app.MapControllers();

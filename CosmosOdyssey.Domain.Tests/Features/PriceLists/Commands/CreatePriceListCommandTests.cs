@@ -10,13 +10,13 @@ namespace CosmosOdyssey.Domain.Tests.Features.PriceLists.Commands;
 [TestFixture]
 public class CreatePriceListCommandTests
 {
-    private Mock<IPriceListRepository> _priceListRepositoryMock;
+    private Mock<IRepository<PriceList>> _priceListRepositoryMock;
     private CreatePriceListCommand.Handler _sut;
 
     [SetUp]
     public void Setup()
     {
-        _priceListRepositoryMock = new Mock<IPriceListRepository>();
+        _priceListRepositoryMock = new Mock<IRepository<PriceList>>();
         _sut = new CreatePriceListCommand.Handler(_priceListRepositoryMock.Object);
     }
 

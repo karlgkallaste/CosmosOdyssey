@@ -1,10 +1,10 @@
-﻿namespace CosmosOdyssey.Domain.Features.PriceLists;
+﻿using CosmosOdyssey.Domain.Features.PriceLists;
 
-public class Company
+namespace CosmosOdyssey.Domain.Features.Companies;
+
+public class Company : IEntity
 {
     public Guid Id { get; private init; }
-    public Guid CompanyId { get; private init; } // Foreign key
-
     public string Name { get; private init; } = null!;
 
     public static Company Create(Guid id, string name)
@@ -12,7 +12,7 @@ public class Company
         return new Company()
         {
             Id = id,
-            Name = name
+            Name = name,
         };
     }
 }

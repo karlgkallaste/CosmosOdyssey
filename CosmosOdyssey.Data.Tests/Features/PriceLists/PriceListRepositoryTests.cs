@@ -1,5 +1,4 @@
-﻿using CosmosOdyssey.Data.Features.PriceLists;
-using CosmosOdyssey.Domain.Features.PriceLists;
+﻿using CosmosOdyssey.Domain.Features.PriceLists;
 using FizzWare.NBuilder;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
@@ -10,7 +9,7 @@ namespace CosmosOdyssey.Data.Tests.Features.PriceLists;
 public class PriceListRepositoryTests
 {
     private ApplicationDbContext _context;
-    private PriceListRepository _sut;
+    private IRepository<PriceList> _sut;
 
     [SetUp]
     public void Setup()
@@ -21,7 +20,7 @@ public class PriceListRepositoryTests
 
         _context = new ApplicationDbContext(options);
 
-        _sut = new PriceListRepository(_context);
+        _sut = new Repository<PriceList>(_context);
     }
 
     

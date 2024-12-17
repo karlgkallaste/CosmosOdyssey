@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Text.Json;
+using CosmosOdyssey.Domain.Features.Legs;
 using CosmosOdyssey.Domain.Features.PriceLists;
 using CosmosOdyssey.Domain.Features.PriceLists.Commands;
 using CosmosOdyssey.Services.PriceListServices.Models;
@@ -11,7 +12,7 @@ namespace CosmosOdyssey.Services.PriceListServices;
 
 public interface IPriceListService
 {
-    Task<Result> GetPrices();
+    Task<Result> GetLatestPriceList();
 }
 
 public class PriceListService : IPriceListService
@@ -32,9 +33,9 @@ public class PriceListService : IPriceListService
         _travelPricesUrl = travelPricesUrl.Value.PriceListUrl;
     }
 
-    public async Task<Result> GetPrices()
+    public async Task<Result> GetLatestPriceList()
     {
-        var response = await _httpClient.GetAsync(_travelPricesUrl);
+        var response = await _httpClient.GetAsync("https://cosmosodyssey.azurewebsites.net/api/v1.0/TravelPrices");
 
         if (response.StatusCode == HttpStatusCode.BadRequest)
         {
@@ -48,8 +49,8 @@ public class PriceListService : IPriceListService
 
         var responseContent = await response.Content.ReadAsStringAsync();
 
-
-        var modelFromResponse = JsonSerializer.Deserialize<PriceListResponseModel>(responseContent);
+        var modelFromResponse = JsonSerializer.Deserialize<PriceListResponseModel>(responseContent,
+            new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
         if (modelFromResponse == null)
         {
@@ -58,18 +59,25 @@ public class PriceListService : IPriceListService
 
         var priceListLegs = modelFromResponse.Legs.Select(x => _priceListLegBuilder
                 .WithId(x.Id)
-                .WithRoutes(x.RouteInfo.Select(r => r.ToDomainObject()).ToArray())
+                .WithRoute(x.RouteInfo.ToDomainObject())
                 .WithProviders(x.Providers.Select(r => r.ToDomainObject()).ToArray())
                 .Build())
             .ToArray();
 
         var priceList = _priceListBuilder
             .WithId(modelFromResponse.Id)
+            .WithCreatedAt(DateTime.Now)
             .WithValidUntil(modelFromResponse.ValidUntil)
             .WithLegs(priceListLegs)
             .Build();
 
-        await _mediator.Publish(new CreatePriceListCommand(priceList));
+        var result = await _mediator.Send(new CreatePriceListCommand(priceList));
+
+        if (result.IsFailed)
+        {
+            throw new Exception("Failed to create price list");
+        }
+
         return Result.Ok();
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using CosmosOdyssey.Domain.Features.Legs;
 using CosmosOdyssey.Domain.Features.PriceLists;
 using CosmosOdyssey.Domain.Features.PriceLists.Commands;
 using CosmosOdyssey.Services.PriceListServices.Models;
@@ -40,14 +41,14 @@ public class PriceListServiceTests
     }
 
     [Test]
-    public async Task GetPrices_Returns_Error_If_Request_Results_In_Bad_Request()
+    public async Task GetLatestPriceList_Returns_Error_If_Request_Results_In_Bad_Request()
     {
         _httpMessageHandlerMock.Protected().Setup<Task<HttpResponseMessage>>("SendAsync",
                 ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
             .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.BadRequest));
 
         // Act
-        var result = await _sut.GetPrices();
+        var result = await _sut.GetLatestPriceList();
 
         // Assert
         result.IsFailed.Should().BeTrue();
@@ -56,14 +57,14 @@ public class PriceListServiceTests
     }
 
     [Test]
-    public async Task GetPrices_Returns_Error_If_Request_Results_In_Server_Error()
+    public async Task GetLatestPriceList_Returns_Error_If_Request_Results_In_Server_Error()
     {
         _httpMessageHandlerMock.Protected().Setup<Task<HttpResponseMessage>>("SendAsync",
                 ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
             .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.InternalServerError));
 
         // Act
-        var result = await _sut.GetPrices();
+        var result = await _sut.GetLatestPriceList();
 
         // Assert
         result.IsFailed.Should().BeTrue();
