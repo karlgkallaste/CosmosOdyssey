@@ -15,7 +15,7 @@ public class PriceListBuilderTests
     }
 
     [Test]
-    public void WithId_Adds_Id_To_PriceList()
+    public void WithExternalId_Adds_External_Id_To_PriceList()
     {
         var expectedId = Guid.NewGuid();
         _sut.WithId(expectedId);
@@ -30,7 +30,7 @@ public class PriceListBuilderTests
     [Test]
     public void WithValidUntil_Adds_Valid_Until_To_PriceList()
     {
-        var expectedDate = DateTimeOffset.UtcNow.AddDays(20);
+        var expectedDate = DateTime.UtcNow.AddDays(20);
         _sut.WithValidUntil(expectedDate);
 
         // Act

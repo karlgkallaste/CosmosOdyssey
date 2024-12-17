@@ -18,9 +18,9 @@ public class CreatePriceListCommand : IRequest<Result>
 
     public class Handler : IRequestHandler<CreatePriceListCommand, Result>
     {
-        private readonly IPriceListRepository _priceListRepository;
+        private readonly IRepository<PriceList> _priceListRepository;
 
-        public Handler(IPriceListRepository priceListRepository)
+        public Handler(IRepository<PriceList> priceListRepository)
         {
             _priceListRepository = priceListRepository;
         }
@@ -33,7 +33,14 @@ public class CreatePriceListCommand : IRequest<Result>
                 return Result.Fail("Price list with this id already exists");
             }
 
-            return await _priceListRepository.AddAsync(command.PriceList);
+            var addResult =  await _priceListRepository.AddAsync(command.PriceList);
+
+            if (addResult.IsFailed)
+            {
+                return Result.Fail(addResult.Errors);
+            }
+            
+            return Result.Ok();
         }
     }
 }

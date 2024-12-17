@@ -1,9 +1,10 @@
-﻿namespace CosmosOdyssey.Domain.Features.PriceLists;
+﻿using CosmosOdyssey.Domain.Features.PriceLists;
 
-public class RouteLocation
+namespace CosmosOdyssey.Domain.Features.Routes;
+
+public class RouteLocation : IEntity
 {
     public Guid Id { get; private init; }
-    public Guid RouteId  { get; private init; }
     public string Name { get; private init; } = null!;
 
     public static RouteLocation Create(Guid id, string name)

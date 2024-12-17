@@ -1,17 +1,21 @@
-﻿namespace CosmosOdyssey.Domain.Features.PriceLists;
+﻿using CosmosOdyssey.Domain.Features.Legs;
 
-public record PriceList
+namespace CosmosOdyssey.Domain.Features.PriceLists;
+
+public record PriceList : IEntity
 {
     public Guid Id { get; private set; }
-    public DateTimeOffset ValidUntil { get; private set; }
-    public ICollection<PriceListLeg> Legs { get; private set; } = new List<PriceListLeg>();
+    public DateTime ValidUntil { get; private set; }
+    public DateTime CreatedAt { get; private set; }
+    public List<PriceListLeg> Legs { get; private set; } = new List<PriceListLeg>();
 
 
     public interface IBuilder
     {
         IBuilder WithId(Guid id);
-        IBuilder WithValidUntil(DateTimeOffset validUntil);
+        IBuilder WithValidUntil(DateTime validUntil);
         IBuilder WithLegs(params PriceListLeg[] legs);
+        IBuilder WithCreatedAt(DateTime createdAt);
         PriceList Build();
     }
 
@@ -25,7 +29,7 @@ public record PriceList
             return this;
         }
 
-        public IBuilder WithValidUntil(DateTimeOffset validUntil)
+        public IBuilder WithValidUntil(DateTime validUntil)
         {
             _priceList.ValidUntil = validUntil;
             return this;
@@ -37,8 +41,15 @@ public record PriceList
             return this;
         }
 
+        public IBuilder WithCreatedAt(DateTime createdAt)
+        {
+            _priceList.CreatedAt = createdAt.ToUniversalTime();
+            return this;
+        }
+
         public PriceList Build()
         {
+            _priceList.Id = Guid.NewGuid();
             return _priceList;
         }
     }
