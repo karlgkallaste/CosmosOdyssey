@@ -24,7 +24,7 @@ public class ApplicationDbContext : DbContext
             .HasColumnType("jsonb")
             .HasConversion(
                 x => JsonConvert.SerializeObject(x),
-                x => JsonConvert.DeserializeObject<List<PriceListLeg>>(x) ?? new List<PriceListLeg>());
+                x => JsonConvert.DeserializeObject<List<Leg>>(x) ?? new List<Leg>());
     }
 }
 

@@ -11,10 +11,10 @@ public static class DataServiceCollection
     {
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseNpgsql("Host=localhost;Database=cosmos_odyssey;Username=cosmos;Password=odyssey"));
-        
+
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
         services.AddTransient<PriceList.IBuilder, PriceList.Builder>();
-        services.AddTransient<PriceListLeg.IBuilder, PriceListLeg.Builder>();
+        services.AddTransient<Leg.IBuilder, Leg.Builder>();
         return services;
     }
 }

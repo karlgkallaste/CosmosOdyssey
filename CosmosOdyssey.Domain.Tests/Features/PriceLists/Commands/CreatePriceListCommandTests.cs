@@ -10,15 +10,15 @@ namespace CosmosOdyssey.Domain.Tests.Features.PriceLists.Commands;
 [TestFixture]
 public class CreatePriceListCommandTests
 {
-    private Mock<IRepository<PriceList>> _priceListRepositoryMock;
-    private CreatePriceListCommand.Handler _sut;
-
     [SetUp]
     public void Setup()
     {
         _priceListRepositoryMock = new Mock<IRepository<PriceList>>();
         _sut = new CreatePriceListCommand.Handler(_priceListRepositoryMock.Object);
     }
+
+    private Mock<IRepository<PriceList>> _priceListRepositoryMock;
+    private CreatePriceListCommand.Handler _sut;
 
 
     [Test]
@@ -34,7 +34,7 @@ public class CreatePriceListCommandTests
 
         // Act
         var result = await _sut.Handle(command, default);
-        
+
         // Assert
         result.IsFailed.Should().BeTrue();
         result.Errors.First().Message.Should().Be("Price list with this id already exists");
@@ -48,15 +48,15 @@ public class CreatePriceListCommandTests
             .With(x => x.PriceList, Builder<PriceList>.CreateNew()
                 .Build())
             .Build();
-        
+
         _priceListRepositoryMock.Setup(x => x.GetByIdAsync(command.PriceList.Id))
             .ReturnsAsync(Result.Fail("not found"));
 
         _priceListRepositoryMock.Setup(x => x.AddAsync(It.IsAny<PriceList>())).ReturnsAsync(Result.Ok);
-        
+
         // Act
         var result = await _sut.Handle(command, default);
-        
+
         // Assert
         result.IsFailed.Should().BeFalse();
     }

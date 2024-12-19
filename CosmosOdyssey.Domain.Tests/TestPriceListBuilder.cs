@@ -3,7 +3,4 @@
 public class TestPriceListBuilder
 {
     private Guid _id = Guid.NewGuid();
-    
-    
-    
 }

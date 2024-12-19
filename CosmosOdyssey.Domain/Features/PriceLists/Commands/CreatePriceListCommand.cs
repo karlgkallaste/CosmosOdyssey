@@ -5,8 +5,6 @@ namespace CosmosOdyssey.Domain.Features.PriceLists.Commands;
 
 public class CreatePriceListCommand : IRequest<Result>
 {
-    public PriceList PriceList { get; private set; }
-
     protected CreatePriceListCommand()
     {
     }
@@ -15,6 +13,8 @@ public class CreatePriceListCommand : IRequest<Result>
     {
         PriceList = priceList;
     }
+
+    public PriceList PriceList { get; }
 
     public class Handler : IRequestHandler<CreatePriceListCommand, Result>
     {
@@ -28,18 +28,12 @@ public class CreatePriceListCommand : IRequest<Result>
         public async Task<Result> Handle(CreatePriceListCommand command, CancellationToken cancellationToken)
         {
             var existingPriceList = await _priceListRepository.GetByIdAsync(command.PriceList.Id);
-            if (existingPriceList.IsSuccess)
-            {
-                return Result.Fail("Price list with this id already exists");
-            }
+            if (existingPriceList.IsSuccess) return Result.Fail("Price list with this id already exists");
 
-            var addResult =  await _priceListRepository.AddAsync(command.PriceList);
+            var addResult = await _priceListRepository.AddAsync(command.PriceList);
 
-            if (addResult.IsFailed)
-            {
-                return Result.Fail(addResult.Errors);
-            }
-            
+            if (addResult.IsFailed) return Result.Fail(addResult.Errors);
+
             return Result.Ok();
         }
     }

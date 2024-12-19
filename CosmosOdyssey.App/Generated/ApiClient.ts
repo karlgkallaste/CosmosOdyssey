@@ -8,6 +8,99 @@
 /* eslint-disable */
 // ReSharper disable InconsistentNaming
 
+export class LegClient {
+    private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }) {
+        this.http = http ? http : window as any;
+        this.baseUrl = baseUrl ?? "";
+    }
+
+    listFilters(): Promise<LegListFilterOptionsModel> {
+        let url_ = this.baseUrl + "/list-filters";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processListFilters(_response);
+        });
+    }
+
+    protected processListFilters(response: Response): Promise<LegListFilterOptionsModel> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = LegListFilterOptionsModel.fromJS(resultData200);
+            return result200;
+            });
+        } else if (status === 400) {
+            return response.text().then((_responseText) => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = BadRequest.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<LegListFilterOptionsModel>(null as any);
+    }
+
+    legs(): Promise<LegListFilterOptionsModel> {
+        let url_ = this.baseUrl + "/list";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processLegs(_response);
+        });
+    }
+
+    protected processLegs(response: Response): Promise<LegListFilterOptionsModel> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = LegListFilterOptionsModel.fromJS(resultData200);
+            return result200;
+            });
+        } else if (status === 400) {
+            return response.text().then((_responseText) => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = BadRequest.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<LegListFilterOptionsModel>(null as any);
+    }
+}
+
 export class WeatherForecastClient {
     private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
     private baseUrl: string;
@@ -52,6 +145,178 @@ export class WeatherForecastClient {
         }
         return Promise.resolve<string>(null as any);
     }
+}
+
+export class LegListFilterOptionsModel implements ILegListFilterOptionsModel {
+    locations?: LocationModel[];
+    companies?: CompanyModel[];
+
+    constructor(data?: ILegListFilterOptionsModel) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["locations"])) {
+                this.locations = [] as any;
+                for (let item of _data["locations"])
+                    this.locations!.push(LocationModel.fromJS(item));
+            }
+            if (Array.isArray(_data["companies"])) {
+                this.companies = [] as any;
+                for (let item of _data["companies"])
+                    this.companies!.push(CompanyModel.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): LegListFilterOptionsModel {
+        data = typeof data === 'object' ? data : {};
+        let result = new LegListFilterOptionsModel();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.locations)) {
+            data["locations"] = [];
+            for (let item of this.locations)
+                data["locations"].push(item.toJSON());
+        }
+        if (Array.isArray(this.companies)) {
+            data["companies"] = [];
+            for (let item of this.companies)
+                data["companies"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface ILegListFilterOptionsModel {
+    locations?: LocationModel[];
+    companies?: CompanyModel[];
+}
+
+export class LocationModel implements ILocationModel {
+    id?: string;
+    name?: string;
+
+    constructor(data?: ILocationModel) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+        }
+    }
+
+    static fromJS(data: any): LocationModel {
+        data = typeof data === 'object' ? data : {};
+        let result = new LocationModel();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        return data;
+    }
+}
+
+export interface ILocationModel {
+    id?: string;
+    name?: string;
+}
+
+export class CompanyModel implements ICompanyModel {
+    id?: string;
+    name?: string;
+
+    constructor(data?: ICompanyModel) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+        }
+    }
+
+    static fromJS(data: any): CompanyModel {
+        data = typeof data === 'object' ? data : {};
+        let result = new CompanyModel();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        return data;
+    }
+}
+
+export interface ICompanyModel {
+    id?: string;
+    name?: string;
+}
+
+export class BadRequest implements IBadRequest {
+    statusCode?: number;
+
+    constructor(data?: IBadRequest) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.statusCode = _data["statusCode"];
+        }
+    }
+
+    static fromJS(data: any): BadRequest {
+        data = typeof data === 'object' ? data : {};
+        let result = new BadRequest();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["statusCode"] = this.statusCode;
+        return data;
+    }
+}
+
+export interface IBadRequest {
+    statusCode?: number;
 }
 
 export class SwaggerException extends Error {

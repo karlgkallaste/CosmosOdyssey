@@ -1,4 +1,5 @@
 using CosmosOdyssey.App.Features.Fares.Models;
+using CosmosOdyssey.App.Features.Legs.Models;
 using CosmosOdyssey.Data;
 using CosmosOdyssey.Domain;
 using CosmosOdyssey.Services;
@@ -18,7 +19,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddMediatR(x => x.RegisterServicesFromAssembly(typeof(Program).Assembly));
 
-builder.Services.AddTransient<ILegInfoProvider, LegInfoProvider>();
+builder.Services.AddTransient<ILegListItemModelProvider, LegListItemModelProvider>();
+
+
 
 builder.Services
     .RegisterDomainServices()
@@ -37,12 +40,12 @@ if (app.Environment.IsDevelopment())
 app.UseHangfireDashboard();
 app.UseHttpsRedirection();
 
-
 using (var scope = app.Services.CreateScope())
 {
     var priceListService = scope.ServiceProvider.GetRequiredService<IPriceListService>();
-    BackgroundJob.Schedule(() => priceListService.GetLatestPriceList(), TimeSpan.FromSeconds(10));
+    //BackgroundJob.Schedule(() => priceListService.GetLatestPriceList(), TimeSpan.FromSeconds(10));
 }
+
 app.UseAuthorization();
 
 app.MapControllers();

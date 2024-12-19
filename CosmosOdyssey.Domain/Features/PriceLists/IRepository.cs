@@ -7,5 +7,5 @@ public interface IRepository<T> where T : IEntity
 {
     Task<Result> AddAsync(T priceList);
     Task<Result<T>> GetByIdAsync(Guid id);
-    Task<IEnumerable<T>> FindAsync(ISpecification<T> specification);
+    Task<List<T>> FindAsync(ISpecification<T> specification);
 }

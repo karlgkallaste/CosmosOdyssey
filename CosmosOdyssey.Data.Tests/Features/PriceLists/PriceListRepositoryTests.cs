@@ -8,9 +8,6 @@ namespace CosmosOdyssey.Data.Tests.Features.PriceLists;
 [TestFixture]
 public class PriceListRepositoryTests
 {
-    private ApplicationDbContext _context;
-    private IRepository<PriceList> _sut;
-
     [SetUp]
     public void Setup()
     {
@@ -23,13 +20,16 @@ public class PriceListRepositoryTests
         _sut = new Repository<PriceList>(_context);
     }
 
-    
+
     [TearDown]
     public void TearDown()
     {
         _context.Dispose();
     }
-    
+
+    private ApplicationDbContext _context;
+    private IRepository<PriceList> _sut;
+
     [Test]
     public async Task AddAsync_Adds_PriceList_Returns_Success()
     {

@@ -17,14 +17,14 @@ public interface IPriceListService
 
 public class PriceListService : IPriceListService
 {
-    private readonly IMediator _mediator;
-    private readonly string _travelPricesUrl;
     private readonly HttpClient _httpClient;
+    private readonly IMediator _mediator;
     private readonly PriceList.IBuilder _priceListBuilder;
-    private readonly PriceListLeg.IBuilder _priceListLegBuilder;
+    private readonly Leg.IBuilder _priceListLegBuilder;
+    private readonly string _travelPricesUrl;
 
     public PriceListService(HttpClient httpClient, IOptions<ApiSettings> travelPricesUrl, IMediator mediator,
-        PriceList.IBuilder priceListBuilder, PriceListLeg.IBuilder priceListLegBuilder)
+        PriceList.IBuilder priceListBuilder, Leg.IBuilder priceListLegBuilder)
     {
         _httpClient = httpClient;
         _mediator = mediator;
@@ -37,25 +37,16 @@ public class PriceListService : IPriceListService
     {
         var response = await _httpClient.GetAsync("https://cosmosodyssey.azurewebsites.net/api/v1.0/TravelPrices");
 
-        if (response.StatusCode == HttpStatusCode.BadRequest)
-        {
-            return Result.Fail("Bad Request(400)");
-        }
+        if (response.StatusCode == HttpStatusCode.BadRequest) return Result.Fail("Bad Request(400)");
 
-        if (response.StatusCode == HttpStatusCode.InternalServerError)
-        {
-            return Result.Fail("Internal Server Error(500)");
-        }
+        if (response.StatusCode == HttpStatusCode.InternalServerError) return Result.Fail("Internal Server Error(500)");
 
         var responseContent = await response.Content.ReadAsStringAsync();
 
         var modelFromResponse = JsonSerializer.Deserialize<PriceListResponseModel>(responseContent,
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-        if (modelFromResponse == null)
-        {
-            return Result.Fail("Failed to parse price list response");
-        }
+        if (modelFromResponse == null) return Result.Fail("Failed to parse price list response");
 
         var priceListLegs = modelFromResponse.Legs.Select(x => _priceListLegBuilder
                 .WithId(x.Id)
@@ -73,10 +64,7 @@ public class PriceListService : IPriceListService
 
         var result = await _mediator.Send(new CreatePriceListCommand(priceList));
 
-        if (result.IsFailed)
-        {
-            throw new Exception("Failed to create price list");
-        }
+        if (result.IsFailed) throw new Exception("Failed to create price list");
 
         return Result.Ok();
     }
