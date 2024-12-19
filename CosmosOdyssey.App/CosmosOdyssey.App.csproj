@@ -7,25 +7,33 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.0">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.0">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.0" />
-        <PackageReference Include="NSwag.AspNetCore" Version="14.2.0" />
-        <PackageReference Include="NSwag.CodeGeneration.CSharp" Version="14.2.0" />
-        <PackageReference Include="NSwag.Generation.AspNetCore" Version="14.2.0" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.0"/>
+        <PackageReference Include="NSwag.AspNetCore" Version="14.2.0"/>
+        <PackageReference Include="NSwag.CodeGeneration.CSharp" Version="14.2.0"/>
+        <PackageReference Include="NSwag.Generation.AspNetCore" Version="14.2.0"/>
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0"/>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\CosmosOdyssey.Data\CosmosOdyssey.Data.csproj" />
-      <ProjectReference Include="..\CosmosOdyssey.Services\CosmosOdyssey.Services.csproj" />
+        <ProjectReference Include="..\CosmosOdyssey.Data\CosmosOdyssey.Data.csproj"/>
+        <ProjectReference Include="..\CosmosOdyssey.Services\CosmosOdyssey.Services.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Generated\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Generated\ApiClient.ts" />
     </ItemGroup>
 
 </Project>

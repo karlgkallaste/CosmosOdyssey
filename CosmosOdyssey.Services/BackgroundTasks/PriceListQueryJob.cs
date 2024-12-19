@@ -6,6 +6,6 @@ public class PriceListQueryJob
 {
     public Task<Result> Query()
     {
-        throw new System.NotImplementedException();
+        throw new NotImplementedException();
     }
 }

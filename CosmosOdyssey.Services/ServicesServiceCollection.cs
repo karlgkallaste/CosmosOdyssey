@@ -11,8 +11,9 @@ public static class ServicesServiceCollection
     public static IServiceCollection RegisterServicesServices(this IServiceCollection services)
     {
         services.AddHangfire(config => config
-            .UsePostgreSqlStorage(options => 
-                options.UseNpgsqlConnection("Host=localhost;Database=cosmos_odyssey;Username=cosmos;Password=odyssey")));
+            .UsePostgreSqlStorage(options =>
+                options.UseNpgsqlConnection(
+                    "Host=localhost;Database=cosmos_odyssey;Username=cosmos;Password=odyssey")));
 
         services.AddHangfireServer();
         services.AddHttpClient();

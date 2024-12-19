@@ -6,5 +6,4 @@ namespace CosmosOdyssey.App.Features.Reservations.Controllers;
 [Route("[controller]")]
 public class ReservationController
 {
-
 }

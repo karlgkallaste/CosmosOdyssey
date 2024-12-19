@@ -6,13 +6,13 @@ namespace CosmosOdyssey.Domain.Tests.Features.PriceLists;
 [TestFixture]
 public class PriceListBuilderTests
 {
-    private PriceList.IBuilder _sut;
-
     [SetUp]
     public void Setup()
     {
         _sut = new PriceList.Builder();
     }
+
+    private PriceList.IBuilder _sut;
 
     [Test]
     public void WithExternalId_Adds_External_Id_To_PriceList()

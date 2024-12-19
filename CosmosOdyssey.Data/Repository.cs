@@ -16,7 +16,6 @@ public class Repository<T> : IRepository<T> where T : class, IEntity
 
     public async Task<Result> AddAsync(T entity)
     {
-
         await using var transaction = await _context.Database.BeginTransactionAsync();
 
         try
@@ -47,22 +46,19 @@ public class Repository<T> : IRepository<T> where T : class, IEntity
             : Result.Ok(entity);
     }
 
-    public async Task<IEnumerable<T>> FindAsync(ISpecification<T> specification)
+    public async Task<List<T>> FindAsync(ISpecification<T> specification)
     {
         IQueryable<T> query = _context.Set<T>();
         query = ApplyEagerLoading(query);
         // Apply the filter from the specification (if provided)
         var predicate = specification.ToExpression();
-        if (predicate != null)
-        {
-            query = query.Where(predicate);
-        }
+        if (predicate != null) query = query.Where(predicate);
 
         // Execute the query and return the results
         return await query.ToListAsync();
     }
 
-    
+
     private IQueryable<T> ApplyEagerLoading(IQueryable<T> query)
     {
         // Use reflection to include navigation properties
@@ -71,10 +67,7 @@ public class Repository<T> : IRepository<T> where T : class, IEntity
         if (entityType == null) return query;
 
         // Include each navigation property
-        foreach (var navigation in entityType.GetNavigations())
-        {
-            query = query.Include(navigation.Name);
-        }
+        foreach (var navigation in entityType.GetNavigations()) query = query.Include(navigation.Name);
 
         return query;
     }

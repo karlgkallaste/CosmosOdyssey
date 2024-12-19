@@ -4,15 +4,12 @@ namespace CosmosOdyssey.Domain.Features.Routes;
 
 public class RouteLocation : IEntity
 {
-    public Guid Id { get; private init; }
     public string Name { get; private init; } = null!;
+    public Guid Id { get; private init; }
 
-    public static RouteLocation Create(Guid id, string name)
+    public RouteLocation(Guid id, string name)
     {
-        return new RouteLocation()
-        {
-            Id = id,
-            Name = name
-        };
+        Id = id;
+        Name = name;
     }
 }
