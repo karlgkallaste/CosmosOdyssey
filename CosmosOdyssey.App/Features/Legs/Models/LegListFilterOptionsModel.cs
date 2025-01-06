@@ -1,6 +1,4 @@
-﻿using CosmosOdyssey.App.Features.Fares.Models;
-
-namespace CosmosOdyssey.App.Features.Legs.Models;
+﻿namespace CosmosOdyssey.App.Features.Legs.Models;
 
 public class LegListFilterOptionsModel
 {

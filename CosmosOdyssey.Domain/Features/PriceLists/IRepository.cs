@@ -5,7 +5,7 @@ namespace CosmosOdyssey.Domain.Features.PriceLists;
 
 public interface IRepository<T> where T : IEntity
 {
-    Task<Result> AddAsync(T priceList);
+    Task<Result> AddAsync(T entity);
     Task<Result<T>> GetByIdAsync(Guid id);
     Task<List<T>> FindAsync(ISpecification<T> specification);
 }

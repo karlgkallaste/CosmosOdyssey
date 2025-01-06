@@ -16,6 +16,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CosmosOdyssey.Data.Tests", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CosmosOdyssey.App.Tests", "CosmosOdyssey.App.Tests\CosmosOdyssey.App.Tests.csproj", "{3C2DCCF1-6594-4885-BFCF-692B399DCC43}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CosmosOdyssey.Client", "CosmosOdyssey.Client\CosmosOdyssey.Client.csproj", "{D44E1FDC-AD10-4532-8CAD-D552FF2DAF38}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -54,5 +56,9 @@ Global
 		{3C2DCCF1-6594-4885-BFCF-692B399DCC43}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3C2DCCF1-6594-4885-BFCF-692B399DCC43}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3C2DCCF1-6594-4885-BFCF-692B399DCC43}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D44E1FDC-AD10-4532-8CAD-D552FF2DAF38}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D44E1FDC-AD10-4532-8CAD-D552FF2DAF38}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D44E1FDC-AD10-4532-8CAD-D552FF2DAF38}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D44E1FDC-AD10-4532-8CAD-D552FF2DAF38}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

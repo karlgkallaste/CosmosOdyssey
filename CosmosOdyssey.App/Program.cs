@@ -1,9 +1,9 @@
-using CosmosOdyssey.App.Features.Fares.Models;
 using CosmosOdyssey.App.Features.Legs.Models;
 using CosmosOdyssey.Data;
 using CosmosOdyssey.Domain;
 using CosmosOdyssey.Services;
 using CosmosOdyssey.Services.PriceListServices;
+using FluentValidation;
 using Hangfire;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,8 +20,16 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddMediatR(x => x.RegisterServicesFromAssembly(typeof(Program).Assembly));
 
 builder.Services.AddTransient<ILegListItemModelProvider, LegListItemModelProvider>();
-
-
+builder.Services.AddValidatorsFromAssemblyContaining<ListFiltersModel.Validator>(); 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowVite", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
 
 builder.Services
     .RegisterDomainServices()
@@ -29,7 +37,7 @@ builder.Services
     .RegisterServicesServices();
 
 var app = builder.Build();
-
+app.UseCors("AllowVite");
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
