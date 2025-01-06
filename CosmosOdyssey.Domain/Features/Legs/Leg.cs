@@ -29,7 +29,7 @@ public class Leg : IEntity
 
     public class Builder : IBuilder
     {
-        private readonly Leg _leg = new();
+        private readonly Leg _leg = new Leg();
 
         public IBuilder WithId(Guid id)
         {
@@ -51,7 +51,8 @@ public class Leg : IEntity
 
         public Leg Build()
         {
-            return _leg;
+            var clone = (Leg)_leg.MemberwiseClone();
+            return clone;
         }
     }
 }

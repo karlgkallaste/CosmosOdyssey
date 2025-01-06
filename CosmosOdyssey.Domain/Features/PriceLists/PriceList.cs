@@ -49,7 +49,6 @@ public record PriceList : IEntity
 
         public PriceList Build()
         {
-            _priceList.Id = Guid.NewGuid();
             return _priceList;
         }
     }
