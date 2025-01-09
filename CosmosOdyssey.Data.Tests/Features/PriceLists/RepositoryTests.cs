@@ -6,29 +6,28 @@ using Microsoft.EntityFrameworkCore;
 namespace CosmosOdyssey.Data.Tests.Features.PriceLists;
 
 [TestFixture]
-public class PriceListRepositoryTests
+public class RepositoryTests
 {
+    private ApplicationDbContext _context;
+    private IRepository<PriceList> _sut;
+
     [SetUp]
     public void Setup()
     {
         var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-            .UseInMemoryDatabase("TestDatabase")
+            .UseInMemoryDatabase("TestDatabase")  // In-memory database for unit tests
             .Options;
 
         _context = new ApplicationDbContext(options);
 
-        _sut = new Repository<PriceList>(_context);
+        _sut = new Repository<PriceList>(_context);  // Assuming your repository uses _context
     }
-
 
     [TearDown]
     public void TearDown()
     {
         _context.Dispose();
     }
-
-    private ApplicationDbContext _context;
-    private IRepository<PriceList> _sut;
 
     [Test]
     public async Task AddAsync_Adds_PriceList_Returns_Success()

@@ -14,8 +14,8 @@ public class ListFiltersModel
     {
         public Validator()
         {
-            RuleFor(x => x.From).NotEmpty().WithMessage("FromId cannot be empty");
-            RuleFor(x => x.To).NotEmpty().WithMessage("FromId cannot be empty");
+            RuleFor(x => x.From).NotEmpty().WithMessage("From cannot be empty");
+            RuleFor(x => x.To).NotEmpty().WithMessage("To cannot be empty");
         }
     }
 }

@@ -45,7 +45,7 @@ public class CreatePriceListCommandTests
     public async Task Handle_Creates_New_PriceList()
     {
         var command = Builder<CreatePriceListCommand>.CreateNew()
-            .With(x => x.PriceList, Builder<PriceList>.CreateNew()
+            .With(x => x.PriceList, Builder<PriceList>.CreateNew().With(x => x.Id, Guid.NewGuid())
                 .Build())
             .Build();
 

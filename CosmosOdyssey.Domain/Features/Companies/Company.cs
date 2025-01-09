@@ -4,6 +4,8 @@ namespace CosmosOdyssey.Domain.Features.Companies;
 
 public class Company : IEntity
 {
+    protected Company() { }
+
     public string Name { get; private init; } = null!;
     public Guid Id { get; private init; }
 

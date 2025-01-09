@@ -283,6 +283,7 @@ export interface IBadRequest {
 export class CreateReservationRequest implements ICreateReservationRequest {
     priceListId?: string;
     name?: PersonNameModel;
+    routes?: ReservationRouteModel[];
 
     constructor(data?: ICreateReservationRequest) {
         if (data) {
@@ -297,6 +298,14 @@ export class CreateReservationRequest implements ICreateReservationRequest {
         if (_data) {
             this.priceListId = _data["priceListId"] !== undefined ? _data["priceListId"] : <any>null;
             this.name = _data["name"] ? PersonNameModel.fromJS(_data["name"], _mappings) : <any>null;
+            if (Array.isArray(_data["routes"])) {
+                this.routes = [] as any;
+                for (let item of _data["routes"])
+                    this.routes!.push(ReservationRouteModel.fromJS(item, _mappings));
+            }
+            else {
+                this.routes = <any>null;
+            }
         }
     }
 
@@ -309,6 +318,11 @@ export class CreateReservationRequest implements ICreateReservationRequest {
         data = typeof data === 'object' ? data : {};
         data["priceListId"] = this.priceListId !== undefined ? this.priceListId : <any>null;
         data["name"] = this.name ? this.name.toJSON() : <any>null;
+        if (Array.isArray(this.routes)) {
+            data["routes"] = [];
+            for (let item of this.routes)
+                data["routes"].push(item.toJSON());
+        }
         return data;
     }
 
@@ -323,6 +337,7 @@ export class CreateReservationRequest implements ICreateReservationRequest {
 export interface ICreateReservationRequest {
     priceListId?: string;
     name?: PersonNameModel;
+    routes?: ReservationRouteModel[];
 }
 
 export class PersonNameModel implements IPersonNameModel {
@@ -368,6 +383,51 @@ export class PersonNameModel implements IPersonNameModel {
 export interface IPersonNameModel {
     firstName?: string;
     lastName?: string;
+}
+
+export class ReservationRouteModel implements IReservationRouteModel {
+    companyId?: string;
+    legId?: string;
+
+    constructor(data?: IReservationRouteModel) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any, _mappings?: any) {
+        if (_data) {
+            this.companyId = _data["companyId"] !== undefined ? _data["companyId"] : <any>null;
+            this.legId = _data["legId"] !== undefined ? _data["legId"] : <any>null;
+        }
+    }
+
+    static fromJS(data: any, _mappings?: any): ReservationRouteModel | null {
+        data = typeof data === 'object' ? data : {};
+        return createInstance<ReservationRouteModel>(data, _mappings, ReservationRouteModel);
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["companyId"] = this.companyId !== undefined ? this.companyId : <any>null;
+        data["legId"] = this.legId !== undefined ? this.legId : <any>null;
+        return data;
+    }
+
+    clone(): ReservationRouteModel {
+        const json = this.toJSON();
+        let result = new ReservationRouteModel();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IReservationRouteModel {
+    companyId?: string;
+    legId?: string;
 }
 
 export class LegListFilterOptionsModel implements ILegListFilterOptionsModel {

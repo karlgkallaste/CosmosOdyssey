@@ -9,6 +9,8 @@ public class Route : IEntity
     public RouteLocation From { get; private set; }
     public double Distance { get; private set; }
 
+    
+    protected Route(){}
     public Route(Guid id, RouteLocation from, RouteLocation to, double distance)
     {
         Id = id;

@@ -1,4 +1,7 @@
-﻿using CosmosOdyssey.Domain.Features.PriceLists;
+﻿using System.Collections.Immutable;
+using CosmosOdyssey.Domain.Features.Legs;
+using CosmosOdyssey.Domain.Features.PriceLists;
+using FizzWare.NBuilder;
 using FluentAssertions;
 
 namespace CosmosOdyssey.Domain.Tests.Features.PriceLists;
@@ -15,7 +18,7 @@ public class PriceListBuilderTests
     private PriceList.IBuilder _sut;
 
     [Test]
-    public void WithExternalId_Adds_External_Id_To_PriceList()
+    public void WithId_adds_external_id_to_priceList()
     {
         var expectedId = Guid.NewGuid();
         _sut.WithId(expectedId);
@@ -28,7 +31,7 @@ public class PriceListBuilderTests
     }
 
     [Test]
-    public void WithValidUntil_Adds_Valid_Until_To_PriceList()
+    public void WithValidUntil_adds_valid_until_to_priceList()
     {
         var expectedDate = DateTime.UtcNow.AddDays(20);
         _sut.WithValidUntil(expectedDate);
@@ -38,5 +41,31 @@ public class PriceListBuilderTests
 
         // Assert
         priceList.ValidUntil.Should().Be(expectedDate);
+    }
+
+    [Test]
+    public void WithLegs_adds_legs_to_priceList()
+    {
+        var expectedLegs = Builder<Leg>.CreateListOfSize(3).Build().ToArray();
+        _sut.WithLegs(expectedLegs);
+
+        // Act
+        var priceList = _sut.Build();
+
+        // Assert
+        priceList.Legs.Should().BeEquivalentTo(expectedLegs);
+    }
+
+    [Test]
+    public void WithCreatedAt_adds_crated_at_date_to_priceList()
+    {
+        var expectedDate = DateTime.UtcNow.AddDays(20);
+        _sut.WithCreatedAt(expectedDate);
+
+        // Act
+        var priceList = _sut.Build();
+
+        // Assert
+        priceList.CreatedAt.Should().Be(expectedDate);
     }
 }

@@ -17,6 +17,7 @@ public record Reservation : IEntity
         IBuilder WithId(Guid id);
         IBuilder WithPriceListId(Guid id);
         IBuilder WithCustomer(Customer customer);
+        IBuilder WithRoutes(ICollection<ReservationRoute> routes);
         Reservation Build();
     }
     
@@ -41,6 +42,12 @@ public record Reservation : IEntity
             return this;
         }
 
+        public IBuilder WithRoutes(ICollection<ReservationRoute> routes)
+        {
+            _reservation.Routes = routes;
+            return this;
+        }
+
         public Reservation Build()
         {
             return _reservation;
@@ -48,7 +55,7 @@ public record Reservation : IEntity
     }
 }
 
-
+public record ReserveRoute(Guid CompanyId, Guid LegId);
 public class ReservationRoute
 {
     public Guid Id { get; set; }

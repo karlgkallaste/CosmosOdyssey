@@ -1,7 +1,8 @@
-﻿import { createRouter, createWebHistory } from "vue-router";
+﻿import {createRouter, createWebHistory} from "vue-router";
 import Home from "../src/views/Home.vue"; // Example of a view/component import
 import About from "../src/views/About.vue"; // Example of a view/component import
 import Legs from "../src/views/Legs.vue"; // Example of a view/component import
+import Reservation from "../src/views/Reservation.vue"; // Example of a view/component import
 
 // Define your routes
 const routes = [
@@ -19,6 +20,12 @@ const routes = [
         path: '/legs/from:from/to:to',
         name: 'Legs',
         component: Legs,
+        props: true
+    },
+    {
+        path: '/reserve',
+        name: 'Reservation',
+        component: Reservation,
         props: true
     },
 ];

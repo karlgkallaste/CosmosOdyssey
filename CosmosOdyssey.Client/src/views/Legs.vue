@@ -29,7 +29,10 @@ export default defineComponent({
     })
   },
   methods: {
-    openReservationModal(route: api.RouteListItemModel) {
+    // navigateToReservation(route: api.RouteListItemModel){
+    //   this.$router.push({name: 'Reservation', params:{fare: route}})
+    // },
+    createReservation(route: api.RouteListItemModel) {
       (this.$refs.modal as any).open(route);
     },
   }
@@ -38,9 +41,9 @@ export default defineComponent({
 
 <template>
   <div v-for="(route, index) in routes" :key="index" class="flex items-center justify-center p-5">
-    <div class="p-6 bg-gray-400 border border-gray-400 rounded-lg shadow-lg w-full max-w-4xl">
-      <h2 class="text-xl font-bold mb-1 text-left">Option {{ index + 1 }}</h2>
-      <p class="text-xl text-white mb-2 text-left">Number of transfers: {{ route.routes?.length || 0 }}</p>
+    <div class="p-6 bg-gray-100 border border-gray-100 rounded-lg shadow-lg w-full max-w-6xl">
+      <h2 class="text-xl text-indigo-400 font-mono font-bold mb-1 text-left">Option {{ index + 1 }}</h2>
+      <p class="text-xl text-indigo-400 font-mono mb-2 text-left">Number of transfers: {{ route.routes?.length || 0 }}</p>
 
       <!-- Stack Legs Vertically -->
       <div v-for="(leg, legIndex) in route.routes" :key="legIndex"
@@ -48,7 +51,7 @@ export default defineComponent({
         <div class="flex items-center justify-between">
           <!-- From - To -->
           <p class="text-gray-600 font-semibold text-sm">
-            <span class="text-amber-500">{{ leg.from?.name }}</span> - <span class="text-amber-600">{{
+            <span class="text-indigo-400">{{ leg.from?.name }}</span> - <span class="text-indigo-600">{{
               leg.to?.name
             }}</span>
           </p>
@@ -58,8 +61,8 @@ export default defineComponent({
         <Accordion value="0" expandIcon="pi pi-plus" collapseIcon="pi pi-minus">
           <AccordionPanel value="2">
             <AccordionHeader>
-              <span class="flex items-center gap-2 w-full text-amber-600">
-                <span class="font-bold whitespace-nowrap">PROVIDERS AND PRICES</span>
+              <span class="flex items-center gap-2 w-full text-indigo-400">
+                <span class="font-bold font-mono whitespace-nowrap">PROVIDERS AND PRICES</span>
             </span>
             </AccordionHeader>
             <AccordionContent class="">
@@ -76,8 +79,8 @@ export default defineComponent({
           </AccordionPanel>
         </Accordion>
       </div>
-      <Button @click="openReservationModal(route)" type="button" label="Reserve" icon="pi pi-ticket"
-              class="w-full bg-amber-950 h-10 text-white hover:bg-amber-600"/>
+      <Button @click="createReservation(route)" type="button" label="Reserve" icon="pi pi-ticket"
+              class="w-full bg-indigo-400 font-mono font-bold mt-5 h-10 text-white hover:bg-indigo-700"/>
 
     </div>
   </div>
