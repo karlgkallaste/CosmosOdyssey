@@ -11,6 +11,7 @@ public class Provider : IEntity
     public DateTime FlightStart { get; private init; }
     public DateTime FlightEnd { get; private init; }
 
+    protected Provider(){}
     public Provider(Guid id, Company company, double price, DateTime flightStart, DateTime flightEnd)
     {
         Id = id;

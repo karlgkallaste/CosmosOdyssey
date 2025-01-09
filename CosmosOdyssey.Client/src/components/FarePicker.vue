@@ -33,13 +33,41 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="flex items-center justify-center mt-10 space-x-4">
-    <div class="w-full max-w-xs md:w-56">
-      <Select v-model="from" :options="locations" key="id" optionLabel="name" placeholder="Select a City"
-              class="w-full"/>
+  <div class="flex flex-col sm:flex-row items-center justify-center mt-10 space-y-4 sm:space-y-0 sm:space-x-4">
+    <!-- "From" Select Component -->
+    <div class="relative w-full sm:w-auto">
+      <Select
+          v-model="from"
+          :options="locations"
+          optionLabel="name"
+          class="w-full sm:w-[300px] bg-indigo-800 font-extrabold text-indigo-100 
+           rounded-lg px-4 py-2 shadow-lg hover:bg-indigo-400 
+           focus:outline-none focus:ring-2 focus:ring-indigo-500"
+      >
+        <!-- Custom Label Slot -->
+        <template #value="slotProps">
+          <span v-if="!slotProps.value" class="text-white">Where from?</span>
+          <span v-else class="font-bold text-white">{{ slotProps.value.name }}</span>
+        </template>
+      </Select>
     </div>
-    <div class="w-full max-w-xs md:w-56">
-      <Select v-model="to" :options="locations" optionLabel="name" placeholder="Select a City" class="w-full"/>
+
+    <!-- "To" Select Component -->
+    <div class="relative w-full sm:w-auto">
+      <Select
+          v-model="to"
+          :options="locations"
+          optionLabel="name"
+          class="w-full sm:w-[300px] bg-indigo-800 font-extrabold text-indigo-100 
+           rounded-lg px-4 py-2 shadow-lg hover:bg-indigo-400 
+           focus:outline-none focus:ring-2 focus:ring-indigo-500"
+      >
+        <!-- Custom Label Slot -->
+        <template #value="slotProps">
+          <span v-if="!slotProps.value" class="text-white">Where to?</span>
+          <span v-else class="font-bold text-white">{{ slotProps.value.name }}</span>
+        </template>
+      </Select>
     </div>
   </div>
 </template>

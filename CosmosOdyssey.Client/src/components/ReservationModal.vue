@@ -7,41 +7,65 @@ export default defineComponent({
   data() {
     return {
       visible: false,
-      route: {} as api.RouteListItemModel,
-      request: {} as api.CreateReservationRequest
+      fare: {} as api.RouteListItemModel,
+      request: {} as api.CreateReservationRequest,
     }
   },
 
-  created() {
-    this.request = new api.CreateReservationRequest();
-    this.request.name = new api.PersonNameModel({firstName: "", lastName: ""})
-    //this.request.routes = [] as api.RouteListItemModel[];
 
-  },
   methods: {
     open(route: api.RouteListItemModel) {
-      console.log(route.priceListId)
-      this.request.priceListId = route.priceListId;
-      // this.request.routes = (route.routes || []).map((leg) => {
-      //   return {
-      //     legId: leg.to?.id, // Map the leg ID from the route
-      //     companyId: undefined, // Initialize companyId with null
-      //   } as api.ReservationRouteModel;
-      // });
+      this.fare = route;
+      this.createEmptyRequest();
       this.visible = true;
     },
-    confirmReservation() {
-      console.log(this.request.priceListId)
-      new api.ReservationClient().create(this.request).then(response => {
 
+    createEmptyRequest() {
+      this.request = new api.CreateReservationRequest();
+      this.request.name = new api.PersonNameModel({firstName: "", lastName: ""})
+      this.request.priceListId = this.fare.priceListId;
+      this.request.routes = [];
+
+    },
+
+    confirmReservation() {
+      new api.ReservationClient().create(this.request).then(response => {
+        console.log(response.status)
+      }).catch(e => {
+        if (e.status == 400) {
+          console.error(e.response);
+          console.log(e)
+        } else {
+          throw e;
+        }
       });
+    },
+
+    selectProvider(legIndex: number, companyId: string, legId: string) {
+      if (this.request.routes == undefined){
+        this.request.routes = [];
+      }
+      this.request.routes[legIndex] = new api.ReservationRouteModel({legId: legId, companyId: companyId});
+    },
+    getProviderInfo(legId: string) : api.ProviderInfoModel | undefined {
+      if (this.request.routes == undefined){
+        return undefined;
+      }
+      let companyId = this.request.routes.find(x => x.legId === legId)?.companyId;
+      const providerInfo = this.fare.routes
+          ?.flatMap(route => route.providers) // Flatten all providers across routes
+          ?.find(provider => provider?.company?.id === companyId);
+
+      return providerInfo;
+      
     }
-  }
+
+  },
 })
 </script>
 
 <template>
-  <Dialog v-model:visible="visible" modal header="Select Providers" :style="{ width: '50rem' }"
+  <Dialog v-model:visible="visible" modal header="Select Providers" :style="{ width: '70rem' }"
           :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
     <div class="flex gap-4">
       <!-- Username Input -->
@@ -59,27 +83,67 @@ export default defineComponent({
       </div>
     </div>
 
-<!--    <div class="flex items-center justify-center p-5">-->
-<!--      <div class="p-6 rounded-lg shadow-lg w-full max-w-4xl">-->
+    <div class="flex items-center justify-center p-5">
+      <div class="p-6 rounded-lg shadow-lg w-full max-w-4xl">
 
-<!--        &lt;!&ndash; Stack Legs Vertically &ndash;&gt;-->
-<!--        <div v-for="(leg, legIndex) in route.routes" :key="legIndex"-->
-<!--             class="bg-gray-200 border border-gray-400 rounded-lg p-3 shadow-md mb-2">-->
-<!--          <div class="flex items-start justify-between">-->
-<!--            &lt;!&ndash; From - To &ndash;&gt;-->
-<!--            <p class="text-gray-600 font-semibold text-sm">-->
-<!--              <span class="text-amber-500">{{ leg.from?.name }}</span> - <span-->
-<!--                class="text-amber-600">{{ leg.to?.name }}</span>-->
-<!--            </p>-->
 
-<!--            <p class="text-amber-500 font-semibold text-sm">Price</p>-->
-<!--          </div>-->
-<!--          <Select v-model="request.routes[legIndex].companyId" :options="leg.providers" optionLabel="company.name"-->
-<!--                  placeholder="Select a City" class="bg-gray-200 border border-gray-400 rounded-xl p-3 shadow-md mb-2"/>-->
+        <!-- Stack Legs Vertically -->
+        <div v-for="(leg, legIndex) in fare.routes" :key="legIndex"
+             class="bg-gray-200 border border-gray-400 rounded-lg p-3 shadow-md mb-4">
+          <div class="flex items-center justify-between">
+            <!-- From - To -->
+            <p class="text-gray-600 font-semibold text-sm">
+              <span class="text-amber-500">{{ leg.from?.name }}</span> - <span class="text-amber-600">{{
+                leg.to?.name
+              }}</span>
+            </p>
+            <p class="text-gray-600 font-semibold text-sm">Price:{{ getProviderInfo(leg.id!)?.price ?? "1" }}</p>
+            <p class="text-gray-600 font-semibold text-sm">Company: {{ getProviderInfo(leg.id!)?.company?.name ?? "2" }}</p>
+          </div>
 
-<!--        </div>-->
-<!--      </div>-->
-<!--    </div>-->
+          <!-- Accordion for Provider Details -->
+          <Accordion value="1" expandIcon="pi pi-plus" collapseIcon="pi pi-minus">
+            <AccordionPanel value="2">
+              <AccordionHeader>
+              <span class="flex items-center gap-2 w-full text-amber-600">
+                <span class="font-bold whitespace-nowrap">Providers</span>
+            </span>
+              </AccordionHeader>
+              <AccordionContent class="">
+                <DataTable :value="leg.providers" tableStyle="min-width: 20rem">
+                  <Column field="company.name" header="Company"></Column>
+                  <Column field="flightStart" header="Start">
+                    <template v-slot:body="slotProps">
+                      {{ new Date(slotProps.data.flightStart).toLocaleDateString('en-US') }}
+                    </template>
+                  </Column>
+
+                  <Column field="flightEnd" header="Arrival">
+                    <template v-slot:body="slotProps">
+                      {{ new Date(slotProps.data.flightEnd).toLocaleDateString('en-US') }}
+                    </template>
+                  </Column>
+                  <Column field="price" header="Price">
+                    <template v-slot:body="slotProps">
+                      ${{ slotProps.data.price.toFixed(2) }}
+                    </template>
+                  </Column>
+                  <Column class="w-24 !text-end">
+                    <template #body="{ data }">
+                      <Button icon="pi pi-check-circle" @click="selectProvider(legIndex, data.company.id, leg.id!)" severity="secondary"
+                              rounded></Button>
+                    </template>
+                  </Column>
+                </DataTable>
+
+
+              </AccordionContent>
+            </AccordionPanel>
+          </Accordion>
+        </div>
+      </div>
+    </div>
+    <h1>Total: $ totalPrice </h1>
     <Button @click="confirmReservation" type="button" label="Confirm"
             class="w-full bg-amber-950 h-10 text-white hover:bg-amber-600"/>
   </Dialog>

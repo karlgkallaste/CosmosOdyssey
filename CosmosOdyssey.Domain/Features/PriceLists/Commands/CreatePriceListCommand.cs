@@ -14,7 +14,7 @@ public class CreatePriceListCommand : IRequest<Result>
         PriceList = priceList;
     }
 
-    public PriceList PriceList { get; }
+    public PriceList PriceList { get; private set; }
 
     public class Handler : IRequestHandler<CreatePriceListCommand, Result>
     {

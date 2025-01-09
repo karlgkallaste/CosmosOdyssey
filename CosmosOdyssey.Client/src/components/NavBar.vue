@@ -1,7 +1,13 @@
 <template>
-  <div class="card">
-    <Menubar :model="items"/>
-  </div>
+    <Menubar :model="items" class="font-mono">
+      <template #end>
+        <div class="flex items-center gap-3 sm:gap-5">
+          <h1 class="text-xl sm:text-2xl font-extrabold font-mono text-indigo-400 bg-indigo-950 p-2 rounded-lg">
+            Space Odyssey
+          </h1>
+        </div>
+      </template>
+    </Menubar>
 </template>
 
 <script>

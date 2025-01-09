@@ -26,7 +26,7 @@ export default defineComponent({
       this.to = payload.to;
       // Navigate to the 'Legs' route with the from and to parameters from the payload
     },
-    navigateToLegsList(){
+    navigateToLegsList() {
       this.$router.push({
         name: 'Legs',
         params: {from: this.from, to: this.to}
@@ -37,24 +37,42 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="grid place-items-center m-10">
-    <div class="text-center mt-10 px-4">
-      <h1 class="text-5xl font-extrabold text-amber-600 bg-amber-950 mb-6">Your Intergalactic Journey Awaits</h1>
-      <p class="text-lg text-gray-500 max-w-2xl mx-auto">
-        Welcome aboard <span class="font-bold text-amber-600">Space Odyssey</span>, the ultimate app for travelers
+  <div class="grid place-items-center m-6 sm:m-10 lg:m-20">
+    <div class="relative text-center mt-10 sm:mt-20 px-4 sm:px-6">
+      <!-- Blur Background -->
+      <div class="absolute inset-0 bg-white opacity-10 blur-3xl -z-10 sm:scale-150 scale-100"></div>
+
+      <!-- Foreground Content -->
+      <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-indigo-400 mb-6 font-mono">
+        Your Intergalactic Journey Awaits
+      </h1>
+      <hr class="mb-6 sm:mb-10">
+      <p class="text-sm sm:text-base lg:text-lg text-gray-100 max-w-xl mx-auto font-mono">
+        Welcome aboard <span class="font-bold text-indigo-200">Space Odyssey</span>, the ultimate app for travelers
         seeking to explore the wonders of the universe. Whether you’re a seasoned space traveler or a curious wanderer,
         our platform offers seamless journeys between planets, solar systems, and galaxies. With just a few taps, you’ll
         be able to plan your voyage, book your travel, and explore the endless beauty of space.
       </p>
+      <hr class="mt-6 sm:mt-10">
     </div>
-    <div class="grid grid-cols-3 gap-4 mt-10 ">
-      <div class="col-span-3">
-        <fare-picker :locations="options.locations" @values-ready="handleValuesReady" class="w-full"/>
-      </div>
 
-      <div class="col-span-3">
-        <Button @click="navigateToLegsList" type="button" label="Search" icon="pi pi-search"
-                class="w-full bg-amber-950 h-10 text-white hover:bg-amber-600"/>
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-3 mt-6 sm:mt-10 w-full px-4">
+      <!-- Fare Picker with Button below it -->
+      <div class="col-span-3 sm:col-span-3 flex flex-col gap-4 w-full mx-auto">
+        <fare-picker
+            :locations="options.locations"
+            @values-ready="handleValuesReady"
+            class="w-full font-mono"
+        />
+        <!-- Button directly under the fare-picker, constrained to the same width -->
+        <Button
+            @click="navigateToLegsList"
+            type="button"
+            label="Find fares"
+            icon="pi pi-search"
+            iconPos="top"
+            class="w-full sm:w-full max-w-[500px] bg-indigo-400 font-mono font-bold mt-5 h-14 sm:h-16 lg:h-20 text-white hover:bg-indigo-700 mx-auto"
+        />
       </div>
     </div>
   </div>

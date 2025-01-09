@@ -3,6 +3,7 @@ using CosmosOdyssey.Domain.Features.PriceLists;
 using CosmosOdyssey.Domain.Features.Reservations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Newtonsoft.Json;
 
 namespace CosmosOdyssey.Data;
@@ -16,6 +17,14 @@ public class ApplicationDbContext : DbContext
     public DbSet<PriceList> PriceLists { get; set; }
     public DbSet<Reservation> Reservations { get; set; }
 
+    
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        base.OnConfiguring(optionsBuilder);
+
+        optionsBuilder.ConfigureWarnings(warnings =>
+            warnings.Ignore(InMemoryEventId.TransactionIgnoredWarning)); // Suppress the transaction warning
+    }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
