@@ -40,14 +40,14 @@ export default defineComponent({
 </script>
 
 <template>
-  <div v-for="(route, index) in routes" :key="index" class="flex items-center justify-center p-5">
-    <div class="p-6 bg-gray-100 border border-gray-100 rounded-lg shadow-lg w-full max-w-6xl">
-      <h2 class="text-xl text-indigo-400 font-mono font-bold mb-1 text-left">Option {{ index + 1 }}</h2>
-      <p class="text-xl text-indigo-400 font-mono mb-2 text-left">Number of transfers: {{ route.routes?.length || 0 }}</p>
+  <div v-for="(route, index) in routes" :key="index" class="flex items-center justify-center p-2">
+    <div class="pb-2 bg-gray-100 border border-gray-100 rounded-s shadow-lg w-full max-w-6xl">
+      <h2 class="text-xl text-indigo-400 font-mono font-bold ml-5 text-left">Option {{ index + 1 }}</h2>
+      <p class="text-xl text-indigo-400 font-mono ml-5 text-left">Number of transfers: {{ route.routes?.length || 0 }}</p>
 
       <!-- Stack Legs Vertically -->
       <div v-for="(leg, legIndex) in route.routes" :key="legIndex"
-           class="bg-gray-200 border border-gray-400 rounded-lg p-3 shadow-md mb-4">
+           class="bg-gray-200 border border-gray-400 rounded-lg p-1 shadow-md mb-4">
         <div class="flex items-center justify-between">
           <!-- From - To -->
           <p class="text-gray-600 font-semibold text-sm">

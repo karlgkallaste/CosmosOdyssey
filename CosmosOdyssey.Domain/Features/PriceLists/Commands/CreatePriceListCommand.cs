@@ -28,7 +28,7 @@ public class CreatePriceListCommand : IRequest<Result>
         public async Task<Result> Handle(CreatePriceListCommand command, CancellationToken cancellationToken)
         {
             var existingPriceList = await _priceListRepository.GetByIdAsync(command.PriceList.Id);
-            if (existingPriceList.IsSuccess) return Result.Fail("Price list with this id already exists");
+            if (existingPriceList != null) return Result.Fail("Price list with this id already exists");
 
             var addResult = await _priceListRepository.AddAsync(command.PriceList);
 

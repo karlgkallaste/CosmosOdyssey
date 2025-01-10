@@ -36,7 +36,7 @@ public class CreateReservationCommandTests
     {
         var command = Builder<CreateReservationCommand>.CreateNew().Build();
 
-        _priceListRepositoryMock.Setup(x => x.GetByIdAsync(command.PriceListId)).ReturnsAsync((Result<PriceList>)null!);
+        _priceListRepositoryMock.Setup(x => x.GetByIdAsync(command.PriceListId)).ReturnsAsync((PriceList?)null!);
 
         // Act
         var result = await _sut.Handle(command, default);
@@ -63,7 +63,7 @@ public class CreateReservationCommandTests
             .Build();
 
         _priceListRepositoryMock.Setup(x => x.GetByIdAsync(command.PriceListId))
-            .ReturnsAsync(Result.Ok(priceList));
+            .ReturnsAsync(priceList);
 
         // Act
         var result = await _sut.Handle(command, default);
@@ -91,7 +91,7 @@ public class CreateReservationCommandTests
             .Build();
 
         _priceListRepositoryMock.Setup(x => x.GetByIdAsync(command.PriceListId))
-            .ReturnsAsync(Result.Ok(priceList));
+            .ReturnsAsync(priceList);
 
         // Act
         var result = await _sut.Handle(command, default);
@@ -134,7 +134,7 @@ public class CreateReservationCommandTests
             .Returns(reservation);
 
         _priceListRepositoryMock.Setup(x => x.GetByIdAsync(command.PriceListId))
-            .ReturnsAsync(Result.Ok(priceList));
+            .ReturnsAsync(priceList);
 
         _reservationRepositoryMock.Setup(x => x.AddAsync(It.IsAny<Reservation>()))
             .ReturnsAsync(Result.Fail("Could not save reservation"));
@@ -179,7 +179,7 @@ public class CreateReservationCommandTests
             .Returns(reservation);
 
         _priceListRepositoryMock.Setup(x => x.GetByIdAsync(command.PriceListId))
-            .ReturnsAsync(Result.Ok(priceList));
+            .ReturnsAsync(priceList);
 
         _reservationRepositoryMock.Setup(x => x.AddAsync(It.IsAny<Reservation>()))
             .ReturnsAsync(Result.Ok());

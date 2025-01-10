@@ -5,6 +5,7 @@ using CosmosOdyssey.Domain.Features.PriceLists;
 using CosmosOdyssey.Domain.Features.PriceLists.Commands;
 using CosmosOdyssey.Services.PriceListServices.Models;
 using FluentResults;
+using Hangfire;
 using MediatR;
 using Microsoft.Extensions.Options;
 
@@ -21,15 +22,17 @@ public class PriceListService : IPriceListService
     private readonly IMediator _mediator;
     private readonly PriceList.IBuilder _priceListBuilder;
     private readonly Leg.IBuilder _priceListLegBuilder;
+    private readonly IRepository<PriceList> _priceListRepository;
     private readonly string _travelPricesUrl;
 
     public PriceListService(HttpClient httpClient, IOptions<ApiSettings> travelPricesUrl, IMediator mediator,
-        PriceList.IBuilder priceListBuilder, Leg.IBuilder priceListLegBuilder)
+        PriceList.IBuilder priceListBuilder, Leg.IBuilder priceListLegBuilder, IRepository<PriceList> priceListRepository)
     {
         _httpClient = httpClient;
         _mediator = mediator;
         _priceListBuilder = priceListBuilder;
         _priceListLegBuilder = priceListLegBuilder;
+        _priceListRepository = priceListRepository;
         _travelPricesUrl = travelPricesUrl.Value.PriceListUrl;
     }
 
@@ -62,10 +65,20 @@ public class PriceListService : IPriceListService
             .WithLegs(priceListLegs)
             .Build();
 
+        var existingPriceList = await _priceListRepository.GetByIdAsync(modelFromResponse.Id);
+
+        if (existingPriceList != null )
+        {
+            return Result.Fail("Price List already exists");
+        }
+        
         var result = await _mediator.Send(new CreatePriceListCommand(priceList));
 
         if (result.IsFailed) throw new Exception("Failed to create price list");
 
+        
+        
+        BackgroundJob.Schedule(() => GetLatestPriceList(), new DateTimeOffset(modelFromResponse.ValidUntil, DateTimeOffset.Now.Offset));
         return Result.Ok();
     }
 }

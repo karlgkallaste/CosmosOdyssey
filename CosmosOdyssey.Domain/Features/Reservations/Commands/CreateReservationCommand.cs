@@ -6,7 +6,7 @@ using MediatR;
 
 namespace CosmosOdyssey.Domain.Features.Reservations.Commands;
 
-public class CreateReservationCommand : IRequest<Result>
+public class CreateReservationCommand : IRequest<Result<Guid>>
 {
     public Guid PriceListId { get; private set; }
     public Customer Customer { get; private set; }
@@ -20,7 +20,7 @@ public class CreateReservationCommand : IRequest<Result>
     }
     protected CreateReservationCommand(){}
 
-    public class Handler : IRequestHandler<CreateReservationCommand, Result>
+    public class Handler : IRequestHandler<CreateReservationCommand, Result<Guid>>
     {
         private readonly IRepository<PriceList> _priceListRepository;
         private readonly IRepository<Reservation> _reservationRepository;
@@ -34,7 +34,7 @@ public class CreateReservationCommand : IRequest<Result>
             _reservationBuilder = reservationBuilder;
         }
 
-        public async Task<Result> Handle(CreateReservationCommand command, CancellationToken cancellationToken)
+        public async Task<Result<Guid>> Handle(CreateReservationCommand command, CancellationToken cancellationToken)
         {
             var existingPriceList = await _priceListRepository.GetByIdAsync(command.PriceListId);
             if (existingPriceList == null) return Result.Fail("Price list not found");
@@ -43,7 +43,7 @@ public class CreateReservationCommand : IRequest<Result>
 
             foreach (var route in command.Routes)
             {
-                var routeLeg = existingPriceList.Value.Legs.FirstOrDefault(x => x.Id == route.LegId);
+                var routeLeg = existingPriceList.Legs.FirstOrDefault(x => x.Id == route.LegId);
 
                 if (routeLeg is null) return Result.Fail("Route not found");
 
@@ -61,8 +61,9 @@ public class CreateReservationCommand : IRequest<Result>
                 });
             }
 
+            var reservationId = Guid.NewGuid();
             var reservation = _reservationBuilder
-                .WithId(Guid.NewGuid())
+                .WithId(reservationId)
                 .WithPriceListId(command.PriceListId)
                 .WithCustomer(command.Customer)
                 .WithRoutes(routes)
@@ -74,8 +75,7 @@ public class CreateReservationCommand : IRequest<Result>
             {
                 return Result.Fail(addResult.Errors);
             }
-
-            return Result.Ok();
+            return Result.Ok(reservationId);
         }
     }
 }

@@ -30,7 +30,10 @@ export default defineComponent({
 
     confirmReservation() {
       new api.ReservationClient().create(this.request).then(response => {
-        console.log(response.status)
+        this.$router.push({
+          name: 'Reservation',
+          params: {id: response}
+        });
       }).catch(e => {
         if (e.status == 400) {
           console.error(e.response);

@@ -52,8 +52,7 @@ public class RepositoryTests
         var result = await _sut.GetByIdAsync(Guid.NewGuid());
 
         // Assert
-        result.IsFailed.Should().BeTrue();
-        result.Errors.First().Message.Should().BeEquivalentTo("Price List not found");
+        result.Should().BeNull();
     }
 
     [Test]
@@ -68,7 +67,6 @@ public class RepositoryTests
         var result = await _sut.GetByIdAsync(priceList.Id);
 
         // Assert
-        result.IsFailed.Should().BeFalse();
-        result.Value.Should().BeEquivalentTo(priceList);
+        result.Should().BeEquivalentTo(priceList);
     }
 }

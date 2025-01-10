@@ -51,7 +51,8 @@ app.UseHttpsRedirection();
 using (var scope = app.Services.CreateScope())
 {
     var priceListService = scope.ServiceProvider.GetRequiredService<IPriceListService>();
-    //BackgroundJob.Schedule(() => priceListService.GetLatestPriceList(), TimeSpan.FromSeconds(10));
+    
+    BackgroundJob.Enqueue(() => priceListService.GetLatestPriceList());
 }
 
 app.UseAuthorization();

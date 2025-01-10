@@ -93,7 +93,9 @@ namespace CosmosOdyssey.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ReservationId");
+                    b.HasIndex("ReservationId", "From", "To")
+                        .IsUnique()
+                        .HasDatabaseName("IX_ReservationRoute_UniqueFromToPerReservation");
 
                     b.ToTable("ReservationRoute");
                 });

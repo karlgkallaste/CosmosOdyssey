@@ -50,7 +50,7 @@ public class CreatePriceListCommandTests
             .Build();
 
         _priceListRepositoryMock.Setup(x => x.GetByIdAsync(command.PriceList.Id))
-            .ReturnsAsync(Result.Fail("not found"));
+            .ReturnsAsync((PriceList?)null);
 
         _priceListRepositoryMock.Setup(x => x.AddAsync(It.IsAny<PriceList>())).ReturnsAsync(Result.Ok);
 

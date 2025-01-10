@@ -22,10 +22,11 @@ public class PriceListServiceTests
         _mediatorMock = new Mock<IMediator>();
         _priceListBuilderMock = new Mock<PriceList.IBuilder>();
         _priceListLegBuilderMock = new Mock<Leg.IBuilder>();
+        _priceListRepositoryMock = new Mock<IRepository<PriceList>>();
 
         var httpClient = new HttpClient(_httpMessageHandlerMock.Object);
         _sut = new PriceListServices.PriceListService(httpClient, _apiSettingsMock.Object, _mediatorMock.Object,
-            _priceListBuilderMock.Object, _priceListLegBuilderMock.Object);
+            _priceListBuilderMock.Object, _priceListLegBuilderMock.Object, _priceListRepositoryMock.Object);
     }
 
     private string _apiUrl = null!;
@@ -34,6 +35,7 @@ public class PriceListServiceTests
     private Mock<IMediator> _mediatorMock;
     private Mock<PriceList.IBuilder> _priceListBuilderMock;
     private Mock<Leg.IBuilder> _priceListLegBuilderMock;
+    private Mock<IRepository<PriceList>> _priceListRepositoryMock;
     private PriceListServices.PriceListService _sut;
 
     [Test]
