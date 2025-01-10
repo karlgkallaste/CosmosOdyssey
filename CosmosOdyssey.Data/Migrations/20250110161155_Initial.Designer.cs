@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CosmosOdyssey.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250106125956_Initial5")]
-    partial class Initial5
+    [Migration("20250110161155_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -96,7 +96,9 @@ namespace CosmosOdyssey.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ReservationId");
+                    b.HasIndex("ReservationId", "From", "To")
+                        .IsUnique()
+                        .HasDatabaseName("IX_ReservationRoute_UniqueFromToPerReservation");
 
                     b.ToTable("ReservationRoute");
                 });

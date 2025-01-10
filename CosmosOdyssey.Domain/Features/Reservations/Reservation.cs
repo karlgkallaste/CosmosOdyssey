@@ -50,6 +50,7 @@ public record Reservation : IEntity
 
         public Reservation Build()
         {
+            var clone = (Reservation)_reservation.MemberwiseClone();
             return _reservation;
         }
     }

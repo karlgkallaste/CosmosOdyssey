@@ -36,14 +36,12 @@ public class Repository<T> : IRepository<T> where T : class, IEntity
         }
     }
 
-    public async Task<Result<T>> GetByIdAsync(Guid id)
+    public async Task<T?> GetByIdAsync(Guid id)
     {
         var entity = await _context.Set<T>()
             .FirstOrDefaultAsync(pl => pl.Id == id);
 
-        return entity == null
-            ? Result.Fail<T>("Price List not found")
-            : Result.Ok(entity);
+        return entity;
     }
 
     public async Task<List<T>> FindAsync(ISpecification<T> specification)

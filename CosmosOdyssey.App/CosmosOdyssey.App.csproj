@@ -34,4 +34,8 @@
       <None Remove="Generated\ApiClient.ts" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Features\Reservations\Models\" />
+    </ItemGroup>
+
 </Project>

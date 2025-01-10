@@ -37,14 +37,14 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="grid place-items-center m-6 sm:m-10 lg:m-20">
+  <div class="grid place-items-center m-1 sm:m-1 lg:m-5">
     <div class="relative text-center mt-10 sm:mt-20 px-4 sm:px-6">
       <!-- Blur Background -->
       <div class="absolute inset-0 bg-white opacity-10 blur-3xl -z-10 sm:scale-150 scale-100"></div>
 
       <!-- Foreground Content -->
       <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-indigo-400 mb-6 font-mono">
-        Your Intergalactic Journey Awaits
+        Your Journey Awaits
       </h1>
       <hr class="mb-6 sm:mb-10">
       <p class="text-sm sm:text-base lg:text-lg text-gray-100 max-w-xl mx-auto font-mono">

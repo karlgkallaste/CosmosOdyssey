@@ -67,7 +67,7 @@ public class LegListItemModelProvider : ILegListItemModelProvider
         FindPaths(filters.From, filters.To, new List<Leg>(), visited);
 
         // Step 5: Transform all paths into LegListItemModel
-        return allPaths.Select(path => new RouteListItemModel
+        var routeList = allPaths.Select(path => new RouteListItemModel
         {
             PriceListId = priceList.Id,
             Routes = path.Select(leg => new RouteInfoModel
@@ -97,5 +97,17 @@ public class LegListItemModelProvider : ILegListItemModelProvider
                 }).ToArray()
             }).ToArray() // Convert the list of LegInfoModel into an array
         }).ToImmutableList();
+        // if (!string.IsNullOrEmpty(filters.SortBy))
+        // {
+        //     routeList = filters.SortDirection.ToLower() switch
+        //     {
+        //         "asc" => routeList.OrderBy(x => GetPropertyValue(x, filters.SortBy)).ToList(),
+        //         "desc" => routeList.OrderByDescending(x => GetPropertyValue(x, filters.SortBy)).ToList(),
+        //         _ => routeList // Default to no sorting if SortDirection is invalid
+        //     };
+        // }
+
+        return routeList.ToImmutableList();
+        
     }
 }

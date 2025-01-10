@@ -1,5 +1,7 @@
 ﻿using System.Collections.Immutable;
 using CosmosOdyssey.App.Features.Reservations.Requests;
+using CosmosOdyssey.Domain.Features.PriceLists;
+using CosmosOdyssey.Domain.Features.Reservations;
 using CosmosOdyssey.Domain.Features.Reservations.Commands;
 using FluentValidation;
 using MediatR;
@@ -13,7 +15,7 @@ namespace CosmosOdyssey.App.Features.Reservations.Controllers;
 public class ReservationController : ControllerBase
 {
     [HttpPost("create")]
-    [ProducesResponseType(typeof(OkResult), 200)]
+    [ProducesResponseType(typeof(Guid), 200)]
     [ProducesResponseType(typeof(BadRequest), 400)]
     public async Task<IActionResult> Create([FromServices] IMediator mediator,
         [FromServices] IValidator<CreateReservationRequest> validator, [FromBody] CreateReservationRequest request)
@@ -32,6 +34,14 @@ public class ReservationController : ControllerBase
             return BadRequest(commandResult.Errors);
         }
 
-        return Ok();
+        return Ok(commandResult.Value);
+    }
+    [HttpPost("list")]
+    [ProducesResponseType(typeof(Guid), 200)]
+    [ProducesResponseType(typeof(BadRequest), 400)]
+    public async Task<IActionResult> List([FromServices] IRepository<Reservation> reservationRepository)
+    {
+        
+        throw new NotImplementedException();
     }
 }

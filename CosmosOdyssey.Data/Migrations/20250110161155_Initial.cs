@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace CosmosOdyssey.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial5 : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -22,6 +22,20 @@ namespace CosmosOdyssey.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Customer", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PriceLists",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    ValidUntil = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Legs = table.Column<string>(type: "jsonb", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PriceLists", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -73,9 +87,10 @@ namespace CosmosOdyssey.Data.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_ReservationRoute_ReservationId",
+                name: "IX_ReservationRoute_UniqueFromToPerReservation",
                 table: "ReservationRoute",
-                column: "ReservationId");
+                columns: new[] { "ReservationId", "From", "To" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Reservations_CustomerId",
@@ -99,6 +114,9 @@ namespace CosmosOdyssey.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "Customer");
+
+            migrationBuilder.DropTable(
+                name: "PriceLists");
         }
     }
 }

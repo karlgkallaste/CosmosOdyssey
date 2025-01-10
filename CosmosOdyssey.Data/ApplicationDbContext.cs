@@ -17,7 +17,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<PriceList> PriceLists { get; set; }
     public DbSet<Reservation> Reservations { get; set; }
 
-    
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         base.OnConfiguring(optionsBuilder);
@@ -25,6 +25,7 @@ public class ApplicationDbContext : DbContext
         optionsBuilder.ConfigureWarnings(warnings =>
             warnings.Ignore(InMemoryEventId.TransactionIgnoredWarning)); // Suppress the transaction warning
     }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -48,28 +49,33 @@ public class ApplicationDbContext : DbContext
                 .HasForeignKey(r => r.PriceListId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Configure the foreign key for Customer
+
+            // Configure the relationship with Customer
             entity.HasOne(r => r.Customer)
-                .WithMany() // Assuming Customer can have many Reservations
+                .WithMany()
                 .HasForeignKey(r => r.CustomerId)
                 .OnDelete(DeleteBehavior.Restrict);
-
-            // Configure one-to-many relationship with ReservationRoute
             entity.HasMany(r => r.Routes)
                 .WithOne(route => route.Reservation)
                 .HasForeignKey(route => route.ReservationId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Cascade); // Cascade delete Routes when Reservation is deleted
         });
-        
+
         modelBuilder.Entity<ReservationRoute>(entity =>
         {
             // Primary key for ReservationRoute
             entity.HasKey(route => route.Id);
 
-            // Configure foreign key relationship with Reservation
+            // Define the relationship with Reservation
             entity.HasOne(route => route.Reservation)
-                .WithMany(r => r.Routes)
-                .HasForeignKey(route => route.ReservationId);
+                .WithMany(reservation => reservation.Routes)
+                .HasForeignKey(route => route.ReservationId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Unique constraint on ReservationId, From, and To
+            entity.HasIndex(route => new { route.ReservationId, route.From, route.To })
+                .IsUnique()
+                .HasDatabaseName("IX_ReservationRoute_UniqueFromToPerReservation");
         });
     }
 }
