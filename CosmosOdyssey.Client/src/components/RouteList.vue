@@ -1,6 +1,5 @@
 <script lang="ts">
 import {defineComponent} from 'vue'
-import ReservationModal from "./ReservationModal.vue";
 import {api} from "../../apiClients.generated";
 import {useToast} from "primevue";
 
@@ -11,9 +10,6 @@ interface CustomErrorResponse {
 
 export default defineComponent({
   name: "RouteList",
-  components: {
-    ReservationModal
-  },
   props: {
     from: {
       type: String,
@@ -56,25 +52,18 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="p-4">
+  <div class="p-6 space-y-8">
+    <!-- Header -->
+    <h2 class="text-3xl font-bold text-gray-800 tracking-wide">Flight Options</h2>
+
     <div v-for="(route, index) in routes" :key="index" class="flex justify-center p-4">
-      <div class="bg-white w-full max-w-6xl p-6 transition-transform duration-300 ease-in-out hover:scale-105">
+      <div class="bg-white w-full max-w-6xl p-6 transition-transform duration-300 ease-in-out hover:scale-105 shadow-lg rounded-lg">
 
         <!-- Option and Number of Transfers (Left-aligned) -->
-        <div class="flex flex-col sm:flex-row justify-between items-center mb-1">
-          <div class="flex flex-col sm:flex-row sm:space-x-4 items-start w-full">
-            <h2 class="text-xl text-gray-700 font-semibold tracking-wide">
-              123
-            </h2>
-            <h2 class="text-xl text-gray-700 font-semibold tracking-wide">
-              price
-            </h2>
-            <h2 class="text-xl text-gray-700 font-semibold tracking-wide">
-              option
-            </h2>
-            <h2 class="text-xl text-gray-700 font-semibold tracking-wide">
-              Number of transfers: {{ route.routes?.length || 0 }}
-            </h2>
+        <div class="flex flex-col sm:flex-row justify-between items-center mb-4">
+          <div class="flex flex-col sm:flex-row sm:space-x-6 items-start w-full">
+            <h3 class="text-2xl font-semibold text-gray-700">Option {{index + 1}}</h3>
+            <p class="text-lg text-gray-600">Number of transfers: {{ route.routes?.length || 0 }}</p>
           </div>
 
           <!-- Reserve Button (Right-aligned) -->
@@ -84,17 +73,20 @@ export default defineComponent({
           </div>
         </div>
 
-
         <!-- Stacked Legs (From -> To) with smooth arrow icon -->
         <Timeline :value="route.routes" layout="horizontal" align="alternate">
-          <template #opposite> &nbsp;</template>
+          <template #opposite>&nbsp;</template>
           <template #content="slotProps">
-            <span class="text-indigo-600">{{ slotProps.item.to?.name }}</span>
+            <span class="text-indigo-600 font-mono">{{ slotProps.item.to?.name }}</span>
+          </template>
+          <template #marker="slotProps">
+            <!-- Custom marker color -->
+            <span class="w-4 h-4 rounded-full bg-indigo-600 flex items-center justify-center font-mono"
+                  :title="slotProps.item.to?.name"></span>
           </template>
         </Timeline>
 
       </div>
-
     </div>
   </div>
 </template>

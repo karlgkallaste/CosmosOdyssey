@@ -25,7 +25,7 @@ public class ReservationProvider : IReservationProvider
             Customer = new PersonNameModel(reservation.Customer.FirstName, reservation.Customer.LastName),
             Routes = reservation.Routes.Select(x => new ReservationRouteDetailsModel()
             {
-                Time = $"{x.TotalTimeInMinutes / 60} hour(s)",
+                Time = x.TotalTimeInMinutes / 60,
                 Price = x.Price,
                 From = x.From,
                 To = x.To
@@ -36,7 +36,7 @@ public class ReservationProvider : IReservationProvider
 
 public class ReservationRouteDetailsModel
 {
-    public string Time { get; set; }
+    public double Time { get; set; }
     public double Price { get; set; }
     public string From { get; set; }
     public string To { get; set; }

@@ -83,11 +83,6 @@ public class LegController : ControllerBase
         [FromQuery] ListFiltersModel filters)
     {
         
-        var validationResult = await validator.ValidateAsync(filters);
-        if (!validationResult.IsValid)
-        {
-            return BadRequest(validationResult.Errors);
-        }
         
         var validPriceLists = await priceListRepository.FindAsync(new ValidUntilNotPassed(DateTime.Now.AddDays(-1)));
         if (validPriceLists is null)
@@ -95,6 +90,12 @@ public class LegController : ControllerBase
             return BadRequest(new ValidationResult());
         }
 
+        var validationResult = await validator.ValidateAsync(filters);
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(validationResult.Errors);
+        }
+        
         var lastPriceList = validPriceLists.OrderBy(x => x.ValidUntil).First();
 
         return Ok(legListProvider.Provide(lastPriceList, filters));
@@ -102,7 +103,7 @@ public class LegController : ControllerBase
 
     [HttpGet("filter-providers")]
     [ProducesResponseType(typeof(ProviderInfoModel[]), 200)]
-    [ProducesResponseType(typeof(BadRequest), 400)]
+    [ProducesResponseType(typeof(BadRequestObjectResult), 400)]
     public async Task<IActionResult> LegProvidersList([FromServices] IRepository<PriceList> priceListRepository,
         [FromQuery] ProviderListFiltersModel filters)
     {
@@ -146,15 +147,5 @@ public class LegController : ControllerBase
 
     public class SearchFiltersModel
     {
-    }
-}
-
-public class ErrorResponse
-{
-    public List<string> Errors { get; set; }
-    
-    public ErrorResponse(params string[] errors)
-    {
-        Errors = errors.ToList();
     }
 }

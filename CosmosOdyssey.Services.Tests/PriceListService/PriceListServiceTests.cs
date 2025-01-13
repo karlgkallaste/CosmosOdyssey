@@ -53,7 +53,7 @@ public class PriceListServiceTests
         // Assert
         result.IsFailed.Should().BeTrue();
         result.Errors.Should().HaveCount(1);
-        result.Errors.First().Message.Should().Be("Bad Request(400)");
+        result.Errors.First().Message.Should().Be("Query failed");
     }
 
     [Test]
@@ -69,6 +69,6 @@ public class PriceListServiceTests
         // Assert
         result.IsFailed.Should().BeTrue();
         result.Errors.Should().HaveCount(1);
-        result.Errors.First().Message.Should().Be("Internal Server Error(500)");
+        result.Errors.First().Message.Should().Be("Server error");
     }
 }

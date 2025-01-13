@@ -38,16 +38,14 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="flex flex-col sm:flex-row items-center justify-center mt-1 space-y-6 sm:space-y-0 sm:space-x-6">
+  <div class="flex flex-col sm:flex-row items-center justify-center mt-6 space-y-6 sm:space-y-0 sm:space-x-6">
     <!-- "From" Select Component -->
-    <div class="relative w-full sm:w-auto">
+    <div class="relative w-full sm:w-[320px]">
       <Select
           v-model="from"
           :options="locations"
           optionLabel="name"
-          class="w-full sm:w-[320px] bg-gradient-to-r from-indigo-600 to-indigo-700 text-white font-semibold 
-           rounded-lg px-5 py-3 shadow-xl hover:from-indigo-500 hover:to-indigo-600 
-           focus:outline-none focus:ring-4 focus:ring-indigo-400 transition-all duration-300 ease-in-out"
+          class="w-full bg-gradient-to-r from-indigo-600 to-indigo-700 text-white font-semibold rounded-lg px-6 py-4 shadow-lg hover:from-indigo-500 hover:to-indigo-600 focus:outline-none focus:ring-4 focus:ring-indigo-400 transition-all duration-300 ease-in-out"
       >
         <!-- Custom Label Slot -->
         <template #value="slotProps">
@@ -58,14 +56,12 @@ export default defineComponent({
     </div>
 
     <!-- "To" Select Component -->
-    <div class="relative w-full sm:w-auto">
+    <div class="relative w-full sm:w-[320px]">
       <Select
           v-model="to"
           :options="locations"
           optionLabel="name"
-          class="w-full sm:w-[320px] bg-gradient-to-r from-indigo-600 to-indigo-700 text-white font-semibold 
-           rounded-lg px-5 py-3 shadow-xl hover:from-indigo-500 hover:to-indigo-600 
-           focus:outline-none focus:ring-4 focus:ring-indigo-400 transition-all duration-300 ease-in-out"
+          class="w-full bg-gradient-to-r from-indigo-600 to-indigo-700 text-white font-semibold rounded-lg px-6 py-4 shadow-lg hover:from-indigo-500 hover:to-indigo-600 focus:outline-none focus:ring-4 focus:ring-indigo-400 transition-all duration-300 ease-in-out"
       >
         <!-- Custom Label Slot -->
         <template #value="slotProps">
@@ -77,13 +73,13 @@ export default defineComponent({
   </div>
 
   <!-- New Row for Calendar -->
-  <div class="w-full mt-6 flex justify-center">
-    <div class="relative w-full sm:w-auto">
+  <div class="w-full mt-2 flex justify-center">
+    <div class="relative w-full sm:w-[320px]">
       <Calendar
-          v-model="departDate"
-          class="w-full sm:w-[320px] bg-gradient-to-r from-indigo-600 to-indigo-700 text-white font-semibold 
-        rounded-lg px-5 py-3 shadow-xl hover:from-indigo-500 hover:to-indigo-600 
+          input-class="w-full sm:w-[320px] bg-gradient-to-r from-indigo-600 to-indigo-700 text-white font-semibold 
+        rounded-lg px-6 py-4 shadow-xl hover:from-indigo-500 hover:to-indigo-600 
         focus:outline-none focus:ring-4 focus:ring-indigo-400 transition-all duration-300 ease-in-out"
+          v-model="departDate"
           placeholder="Select Date and Time"
       />
     </div>

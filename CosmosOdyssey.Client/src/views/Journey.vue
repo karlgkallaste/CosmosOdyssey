@@ -4,6 +4,11 @@ import {api} from "../../apiClients.generated";
 import RouteList from "../components/RouteList.vue";
 import ReservationTab from "../components/ReservationTab.vue";
 
+interface ValidationErrorResponse {
+  status: number;
+  response: { errorMessage: string }[]; // An array of error objects with an errorMessage field
+}
+
 export default defineComponent({
   name: "Journey",
   components: {ReservationTab, RouteList},
@@ -36,18 +41,25 @@ export default defineComponent({
       new api.ReservationClient().create(request).then(response => {
         this.$router.push({
           name: 'Reservation',
-          params: {id: response}
+          query: {id: response}
         });
       }).catch(e => {
         if (e.status == 400) {
-          console.error(e.response.data as string);
-          console.log(e)
+          const parsedResponse = JSON.parse(e.response);
+          parsedResponse.forEach((error: { errorMessage: string }) => {
+            this.$toast.add({
+              severity: 'error',
+              summary: 'Validation Error',
+              detail: error.errorMessage, // Display each error message in the toast
+              life: 3000, // Toast duration
+            });
+          });
         } else {
           throw e;
         }
       });
     },
-  }
+  },
 })
 </script>
 
@@ -55,12 +67,13 @@ export default defineComponent({
 <template>
   <div class="flex flex-col sm:flex-row gap-4">
     <div class="flex-1 p-4 bg-gray-100 rounded-lg shadow-md">
-      <h2 class="text-xl font-semibold text-gray-700">Available routes</h2>
-      <route-list @create-reservation="(selectedRoute, priceListId) => setRouteInfo(selectedRoute, priceListId)" :to="to" :from="from"
+      <route-list @create-reservation="(selectedRoute, priceListId) => setRouteInfo(selectedRoute, priceListId)"
+                  :to="to" :from="from"
                   :depart-date="departDate.toISOString()"></route-list>
     </div>
-    <div class="flex-1 p-4 bg-gray-100 rounded-lg shadow-md">
-      <reservation-tab @reservation-confirmed="(reservation) => createReservation(reservation)" :priceListId="priceListId" :route="route"></reservation-tab>
+    <div class="p-4 bg-gray-100 rounded-lg shadow-md">
+      <reservation-tab @reservation-confirmed="(reservation) => createReservation(reservation)"
+                       :priceListId="priceListId" :route="route"></reservation-tab>
 
     </div>
   </div>

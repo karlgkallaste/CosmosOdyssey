@@ -53,11 +53,12 @@ public class CreateReservationCommand : IRequest<Result<Guid>>
 
                 routes.Add(new ReservationRoute()
                 {
-                    Id = routeLeg.Id,
+                    Id = Guid.NewGuid(),
                     Company = company.Company.Name,
                     From = routeLeg.Route.From.Name,
                     To = routeLeg.Route.To.Name,
                     Price = company.Price,
+                    TotalTimeInMinutes = (company.FlightEnd - company.FlightStart).TotalMinutes,
                     Arrival = company.FlightEnd,
                     Depart = company.FlightStart
                 });

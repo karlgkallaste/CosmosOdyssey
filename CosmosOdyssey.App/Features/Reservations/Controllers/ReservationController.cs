@@ -6,6 +6,7 @@ using CosmosOdyssey.Domain.Features.Reservations;
 using CosmosOdyssey.Domain.Features.Reservations.Commands;
 using CosmosOdyssey.Domain.Features.Reservations.Specifications;
 using FluentValidation;
+using FluentValidation.Results;
 using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -18,7 +19,7 @@ public class ReservationController : ControllerBase
 {
     [HttpPost("create")]
     [ProducesResponseType(typeof(Guid), 200)]
-    [ProducesResponseType(typeof(BadRequest), 400)]
+    [ProducesResponseType(typeof(ValidationResult), 400)]
     public async Task<IActionResult> Create([FromServices] IMediator mediator,
         [FromServices] IValidator<CreateReservationRequest> validator, [FromBody] CreateReservationRequest request)
     {

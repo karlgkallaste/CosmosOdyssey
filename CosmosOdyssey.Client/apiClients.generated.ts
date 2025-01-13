@@ -29,18 +29,8 @@ export class ClientBase {
 
     protected transformResult(url: any, response: any, handleResponse: any): any {
 
-        if (response.status == 401) {
-            return;
-        }
-        if (response.status == 409) {
-            if (!this._handleGlobalConflict) {
-                return Promise.reject(response);
-            }
-            window.alert("Ressurss on vahepeal muutunud, palun värskendage lehte.");
-            return Promise.reject(response);
-        }
         if (response.status == 500) {
-            if (confirm("Midagi läks valesti. Kas värskendan lehte?")) {
+            if (confirm("Something went wrong. Refresh the page?")) {
                 location.reload();
                 return;
             }
@@ -101,7 +91,7 @@ export class ReservationClient extends ClientBase {
             return response.text().then((_responseText) => {
             let result400: any = null;
             let resultData400 = _responseText === "" ? null : jsonParse(_responseText, this.jsonParseReviver);
-            result400 = BadRequest.fromJS(resultData400, _mappings);
+            result400 = ValidationResult.fromJS(resultData400, _mappings);
             return throwException("A server side error occurred.", status, _responseText, _headers, result400);
             });
         } else if (status !== 200 && status !== 204) {
@@ -389,7 +379,8 @@ export class LegClient extends ClientBase {
             return response.text().then((_responseText) => {
             let result400: any = null;
             let resultData400 = _responseText === "" ? null : jsonParse(_responseText, this.jsonParseReviver);
-            result400 = BadRequest.fromJS(resultData400, _mappings);
+                result400 = resultData400 !== undefined ? resultData400 : <any>null;
+    
             return throwException("A server side error occurred.", status, _responseText, _headers, result400);
             });
         } else if (status !== 200 && status !== 204) {
@@ -401,10 +392,12 @@ export class LegClient extends ClientBase {
     }
 }
 
-export class BadRequest implements IBadRequest {
-    statusCode?: number;
+export class ValidationResult implements IValidationResult {
+    isValid?: boolean;
+    errors?: ValidationFailure[] | null;
+    ruleSetsExecuted?: string[] | null;
 
-    constructor(data?: IBadRequest) {
+    constructor(data?: IValidationResult) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -415,31 +408,145 @@ export class BadRequest implements IBadRequest {
 
     init(_data?: any, _mappings?: any) {
         if (_data) {
-            this.statusCode = _data["statusCode"] !== undefined ? _data["statusCode"] : <any>null;
+            this.isValid = _data["isValid"] !== undefined ? _data["isValid"] : <any>null;
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(ValidationFailure.fromJS(item, _mappings));
+            }
+            else {
+                this.errors = <any>null;
+            }
+            if (Array.isArray(_data["ruleSetsExecuted"])) {
+                this.ruleSetsExecuted = [] as any;
+                for (let item of _data["ruleSetsExecuted"])
+                    this.ruleSetsExecuted!.push(item);
+            }
+            else {
+                this.ruleSetsExecuted = <any>null;
+            }
         }
     }
 
-    static fromJS(data: any, _mappings?: any): BadRequest | null {
+    static fromJS(data: any, _mappings?: any): ValidationResult | null {
         data = typeof data === 'object' ? data : {};
-        return createInstance<BadRequest>(data, _mappings, BadRequest);
+        return createInstance<ValidationResult>(data, _mappings, ValidationResult);
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["statusCode"] = this.statusCode !== undefined ? this.statusCode : <any>null;
+        data["isValid"] = this.isValid !== undefined ? this.isValid : <any>null;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item.toJSON());
+        }
+        if (Array.isArray(this.ruleSetsExecuted)) {
+            data["ruleSetsExecuted"] = [];
+            for (let item of this.ruleSetsExecuted)
+                data["ruleSetsExecuted"].push(item);
+        }
         return data;
     }
 
-    clone(): BadRequest {
+    clone(): ValidationResult {
         const json = this.toJSON();
-        let result = new BadRequest();
+        let result = new ValidationResult();
         result.init(json);
         return result;
     }
 }
 
-export interface IBadRequest {
-    statusCode?: number;
+export interface IValidationResult {
+    isValid?: boolean;
+    errors?: ValidationFailure[] | null;
+    ruleSetsExecuted?: string[] | null;
+}
+
+export class ValidationFailure implements IValidationFailure {
+    propertyName?: string | null;
+    errorMessage?: string | null;
+    attemptedValue?: any | null;
+    customState?: any | null;
+    severity?: Severity;
+    errorCode?: string | null;
+    formattedMessagePlaceholderValues?: { [key: string]: any; } | null;
+
+    constructor(data?: IValidationFailure) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any, _mappings?: any) {
+        if (_data) {
+            this.propertyName = _data["propertyName"] !== undefined ? _data["propertyName"] : <any>null;
+            this.errorMessage = _data["errorMessage"] !== undefined ? _data["errorMessage"] : <any>null;
+            this.attemptedValue = _data["attemptedValue"] !== undefined ? _data["attemptedValue"] : <any>null;
+            this.customState = _data["customState"] !== undefined ? _data["customState"] : <any>null;
+            this.severity = _data["severity"] !== undefined ? _data["severity"] : <any>null;
+            this.errorCode = _data["errorCode"] !== undefined ? _data["errorCode"] : <any>null;
+            if (_data["formattedMessagePlaceholderValues"]) {
+                this.formattedMessagePlaceholderValues = {} as any;
+                for (let key in _data["formattedMessagePlaceholderValues"]) {
+                    if (_data["formattedMessagePlaceholderValues"].hasOwnProperty(key))
+                        (<any>this.formattedMessagePlaceholderValues)![key] = _data["formattedMessagePlaceholderValues"][key] !== undefined ? _data["formattedMessagePlaceholderValues"][key] : <any>null;
+                }
+            }
+            else {
+                this.formattedMessagePlaceholderValues = <any>null;
+            }
+        }
+    }
+
+    static fromJS(data: any, _mappings?: any): ValidationFailure | null {
+        data = typeof data === 'object' ? data : {};
+        return createInstance<ValidationFailure>(data, _mappings, ValidationFailure);
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["propertyName"] = this.propertyName !== undefined ? this.propertyName : <any>null;
+        data["errorMessage"] = this.errorMessage !== undefined ? this.errorMessage : <any>null;
+        data["attemptedValue"] = this.attemptedValue !== undefined ? this.attemptedValue : <any>null;
+        data["customState"] = this.customState !== undefined ? this.customState : <any>null;
+        data["severity"] = this.severity !== undefined ? this.severity : <any>null;
+        data["errorCode"] = this.errorCode !== undefined ? this.errorCode : <any>null;
+        if (this.formattedMessagePlaceholderValues) {
+            data["formattedMessagePlaceholderValues"] = {};
+            for (let key in this.formattedMessagePlaceholderValues) {
+                if (this.formattedMessagePlaceholderValues.hasOwnProperty(key))
+                    (<any>data["formattedMessagePlaceholderValues"])[key] = this.formattedMessagePlaceholderValues[key] !== undefined ? this.formattedMessagePlaceholderValues[key] : <any>null;
+            }
+        }
+        return data;
+    }
+
+    clone(): ValidationFailure {
+        const json = this.toJSON();
+        let result = new ValidationFailure();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IValidationFailure {
+    propertyName?: string | null;
+    errorMessage?: string | null;
+    attemptedValue?: any | null;
+    customState?: any | null;
+    severity?: Severity;
+    errorCode?: string | null;
+    formattedMessagePlaceholderValues?: { [key: string]: any; } | null;
+}
+
+export enum Severity {
+    Error = 0,
+    Warning = 1,
+    Info = 2,
 }
 
 export class CreateReservationRequest implements ICreateReservationRequest {
@@ -657,6 +764,47 @@ export interface IReservationListItemModel {
     to?: string;
 }
 
+export class BadRequest implements IBadRequest {
+    statusCode?: number;
+
+    constructor(data?: IBadRequest) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any, _mappings?: any) {
+        if (_data) {
+            this.statusCode = _data["statusCode"] !== undefined ? _data["statusCode"] : <any>null;
+        }
+    }
+
+    static fromJS(data: any, _mappings?: any): BadRequest | null {
+        data = typeof data === 'object' ? data : {};
+        return createInstance<BadRequest>(data, _mappings, BadRequest);
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["statusCode"] = this.statusCode !== undefined ? this.statusCode : <any>null;
+        return data;
+    }
+
+    clone(): BadRequest {
+        const json = this.toJSON();
+        let result = new BadRequest();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IBadRequest {
+    statusCode?: number;
+}
+
 export class ReservationDetailsModel implements IReservationDetailsModel {
     id?: string;
     customer?: PersonNameModel;
@@ -718,7 +866,7 @@ export interface IReservationDetailsModel {
 }
 
 export class ReservationRouteDetailsModel implements IReservationRouteDetailsModel {
-    time?: string;
+    time?: number;
     price?: number;
     from?: string;
     to?: string;
@@ -764,7 +912,7 @@ export class ReservationRouteDetailsModel implements IReservationRouteDetailsMod
 }
 
 export interface IReservationRouteDetailsModel {
-    time?: string;
+    time?: number;
     price?: number;
     from?: string;
     to?: string;
@@ -1138,163 +1286,6 @@ export interface ICompanyInfoModel {
     name?: string;
 }
 
-export class ValidationResult implements IValidationResult {
-    isValid?: boolean;
-    errors?: ValidationFailure[] | null;
-    ruleSetsExecuted?: string[] | null;
-
-    constructor(data?: IValidationResult) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any, _mappings?: any) {
-        if (_data) {
-            this.isValid = _data["isValid"] !== undefined ? _data["isValid"] : <any>null;
-            if (Array.isArray(_data["errors"])) {
-                this.errors = [] as any;
-                for (let item of _data["errors"])
-                    this.errors!.push(ValidationFailure.fromJS(item, _mappings));
-            }
-            else {
-                this.errors = <any>null;
-            }
-            if (Array.isArray(_data["ruleSetsExecuted"])) {
-                this.ruleSetsExecuted = [] as any;
-                for (let item of _data["ruleSetsExecuted"])
-                    this.ruleSetsExecuted!.push(item);
-            }
-            else {
-                this.ruleSetsExecuted = <any>null;
-            }
-        }
-    }
-
-    static fromJS(data: any, _mappings?: any): ValidationResult | null {
-        data = typeof data === 'object' ? data : {};
-        return createInstance<ValidationResult>(data, _mappings, ValidationResult);
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["isValid"] = this.isValid !== undefined ? this.isValid : <any>null;
-        if (Array.isArray(this.errors)) {
-            data["errors"] = [];
-            for (let item of this.errors)
-                data["errors"].push(item.toJSON());
-        }
-        if (Array.isArray(this.ruleSetsExecuted)) {
-            data["ruleSetsExecuted"] = [];
-            for (let item of this.ruleSetsExecuted)
-                data["ruleSetsExecuted"].push(item);
-        }
-        return data;
-    }
-
-    clone(): ValidationResult {
-        const json = this.toJSON();
-        let result = new ValidationResult();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IValidationResult {
-    isValid?: boolean;
-    errors?: ValidationFailure[] | null;
-    ruleSetsExecuted?: string[] | null;
-}
-
-export class ValidationFailure implements IValidationFailure {
-    propertyName?: string | null;
-    errorMessage?: string | null;
-    attemptedValue?: any | null;
-    customState?: any | null;
-    severity?: Severity;
-    errorCode?: string | null;
-    formattedMessagePlaceholderValues?: { [key: string]: any; } | null;
-
-    constructor(data?: IValidationFailure) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any, _mappings?: any) {
-        if (_data) {
-            this.propertyName = _data["propertyName"] !== undefined ? _data["propertyName"] : <any>null;
-            this.errorMessage = _data["errorMessage"] !== undefined ? _data["errorMessage"] : <any>null;
-            this.attemptedValue = _data["attemptedValue"] !== undefined ? _data["attemptedValue"] : <any>null;
-            this.customState = _data["customState"] !== undefined ? _data["customState"] : <any>null;
-            this.severity = _data["severity"] !== undefined ? _data["severity"] : <any>null;
-            this.errorCode = _data["errorCode"] !== undefined ? _data["errorCode"] : <any>null;
-            if (_data["formattedMessagePlaceholderValues"]) {
-                this.formattedMessagePlaceholderValues = {} as any;
-                for (let key in _data["formattedMessagePlaceholderValues"]) {
-                    if (_data["formattedMessagePlaceholderValues"].hasOwnProperty(key))
-                        (<any>this.formattedMessagePlaceholderValues)![key] = _data["formattedMessagePlaceholderValues"][key] !== undefined ? _data["formattedMessagePlaceholderValues"][key] : <any>null;
-                }
-            }
-            else {
-                this.formattedMessagePlaceholderValues = <any>null;
-            }
-        }
-    }
-
-    static fromJS(data: any, _mappings?: any): ValidationFailure | null {
-        data = typeof data === 'object' ? data : {};
-        return createInstance<ValidationFailure>(data, _mappings, ValidationFailure);
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["propertyName"] = this.propertyName !== undefined ? this.propertyName : <any>null;
-        data["errorMessage"] = this.errorMessage !== undefined ? this.errorMessage : <any>null;
-        data["attemptedValue"] = this.attemptedValue !== undefined ? this.attemptedValue : <any>null;
-        data["customState"] = this.customState !== undefined ? this.customState : <any>null;
-        data["severity"] = this.severity !== undefined ? this.severity : <any>null;
-        data["errorCode"] = this.errorCode !== undefined ? this.errorCode : <any>null;
-        if (this.formattedMessagePlaceholderValues) {
-            data["formattedMessagePlaceholderValues"] = {};
-            for (let key in this.formattedMessagePlaceholderValues) {
-                if (this.formattedMessagePlaceholderValues.hasOwnProperty(key))
-                    (<any>data["formattedMessagePlaceholderValues"])[key] = this.formattedMessagePlaceholderValues[key] !== undefined ? this.formattedMessagePlaceholderValues[key] : <any>null;
-            }
-        }
-        return data;
-    }
-
-    clone(): ValidationFailure {
-        const json = this.toJSON();
-        let result = new ValidationFailure();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IValidationFailure {
-    propertyName?: string | null;
-    errorMessage?: string | null;
-    attemptedValue?: any | null;
-    customState?: any | null;
-    severity?: Severity;
-    errorCode?: string | null;
-    formattedMessagePlaceholderValues?: { [key: string]: any; } | null;
-}
-
-export enum Severity {
-    Error = 0,
-    Warning = 1,
-    Info = 2,
-}
-
 function jsonParse(json: any, reviver?: any) {
     json = JSON.parse(json, reviver);
 
@@ -1354,6 +1345,13 @@ function createInstance<T>(data: any, mappings: any, type: any): T | null {
   mappings.push({ source: data, target: result });
   result.init(data, mappings);
   return result;
+}
+
+export interface FileResponse {
+    data: Blob;
+    status: number;
+    fileName?: string;
+    headers?: { [name: string]: any };
 }
 
 export class ApiException extends Error {

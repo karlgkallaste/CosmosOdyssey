@@ -96,7 +96,7 @@ public class ReservationControllerTests
         var result = await _sut.Create(_mediatorMock.Object, _validatorMock.Object, request);
 
         // Assert
-        result.Should().BeOfType<OkResult>();
+        result.Should().BeOfType<OkObjectResult>();
         _mediatorMock.Verify(x => x.Send(It.IsAny<CreateReservationCommand>(), default), Times.Once);
     }
 }

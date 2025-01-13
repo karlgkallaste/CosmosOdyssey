@@ -63,7 +63,7 @@ public class ReservationRoute
     public Guid ReservationId { get; set; } // Foreign key to Reservation
     public string From { get; set; }
     public string To { get; set; }
-    public long TotalTimeInMinutes { get; set; }
+    public double TotalTimeInMinutes { get; set; }
     public double Price { get; set; }
     public string Company { get; set; }
     public DateTime Arrival { get; set; }

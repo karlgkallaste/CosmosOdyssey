@@ -20,6 +20,7 @@ import Timeline  from "primevue/timeline";
 import Divider  from "primevue/divider";
 import DatePicker  from "primevue/datepicker";
 import Toast  from "primevue/toast";
+import FloatLabel  from "primevue/floatlabel";
 import router from "../router/router.ts";
 import ToastService from 'primevue/toastservice';
 import './tailwind.css';
@@ -56,4 +57,5 @@ createApp(App)
     .component('Divider', Divider)
     .component('Calendar', DatePicker)
     .component('Toast', Toast)
+    .component('FloatLabel', FloatLabel)
     .mount('#app')

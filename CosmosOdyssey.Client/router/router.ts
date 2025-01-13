@@ -24,16 +24,20 @@ const routes = [
         props: true
     },
     {
-        path: '/reservation',
+        path: '/reservation/',
         name: 'Reservation',
         component: Reservation,
         props: true
     },
     {
-        path: '/reservations',
+        path: '/reservation/list',
         name: 'Reservations',
         component: ReservationList,
         props: true
+    },
+    {
+        path: "/:pathMatch(.*)*",
+        redirect: { name: "Home" },
     },
 ];
 

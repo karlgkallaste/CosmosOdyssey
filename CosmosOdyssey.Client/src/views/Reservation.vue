@@ -24,9 +24,9 @@ export default defineComponent({
   },
   computed:{
     totalPrice(){
-      return this.reservation.routes!.reduce((total, route) => {
+      return this.reservation.routes ? this.reservation.routes.reduce((total, route) => {
         return total + (Number.parseFloat(route.price!.toString()) || 0); // Adding price, defaulting to 0 if route.price is undefined or null
-      }, 0)
+      }, 0) : 0
     }
   }
 })
@@ -45,14 +45,14 @@ export default defineComponent({
     </p>
 
     <!-- Routes Section -->
-    <div class="w-full max-w-4xl space-y-4 mt-6">
+    <div v-if="reservation.routes" class="w-full max-w-4xl space-y-4 mt-6">
       <div
           v-for="(route, index) in reservation.routes"
           :key="index"
           class="flex justify-between items-center bg-indigo-600/80 px-6 py-4 rounded-lg shadow-sm hover:shadow-lg transition-shadow"
       >
         <span class="text-base sm:text-lg font-semibold">{{ route.from }} → {{ route.to }}</span>
-        <span class="text-sm sm:text-base text-gray-200">{{ route.time }}</span>
+        <span class="text-sm sm:text-base text-gray-200">{{ route.time?.toFixed(0) }} hours</span>
         <span class="text-base sm:text-lg font-bold">${{ route.price!.toFixed(2) }}</span>
       </div>
     </div>

@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CosmosOdyssey.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250110161155_Initial")]
+    [Migration("20250113175807_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -73,9 +73,15 @@ namespace CosmosOdyssey.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<DateTime>("Arrival")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Company")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<DateTime>("Depart")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("From")
                         .IsRequired()
@@ -91,14 +97,12 @@ namespace CosmosOdyssey.Data.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<long>("TotalTimeInMinutes")
-                        .HasColumnType("bigint");
+                    b.Property<double>("TotalTimeInMinutes")
+                        .HasColumnType("double precision");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ReservationId", "From", "To")
-                        .IsUnique()
-                        .HasDatabaseName("IX_ReservationRoute_UniqueFromToPerReservation");
+                    b.HasIndex("ReservationId");
 
                     b.ToTable("ReservationRoute");
                 });
