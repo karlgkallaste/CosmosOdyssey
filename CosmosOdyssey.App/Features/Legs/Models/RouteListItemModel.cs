@@ -36,7 +36,7 @@ public class LegListItemModelProvider : ILegListItemModelProvider
         var allPaths = new List<List<Leg>>();
 
         // Helper method to recursively find paths from start to end
-        void FindPaths(string current, string destination, List<Leg> currentPath, HashSet<string> visited)
+        void FindPaths(string current, string destination, DateTimeOffset departingAfter, List<Leg> currentPath, HashSet<string> visited)
         {
             if (visited.Contains(current)) return; // Avoid cycles
 
@@ -48,13 +48,14 @@ public class LegListItemModelProvider : ILegListItemModelProvider
                 {
                     var newPath = new List<Leg>(currentPath) { leg };
 
-                    if (leg.Route.To.Name == destination)
+                    if (leg.Route.To.Name == destination 
+                        && leg.Providers.Any(x => x.FlightStart.Date > departingAfter.Date))
                     {
                         allPaths.Add(newPath); // Found a valid path
                     }
                     else
                     {
-                        FindPaths(leg.Route.To.Name, destination, newPath, visited); // Recursively explore next legs
+                        FindPaths(leg.Route.To.Name, destination, departingAfter, newPath, visited); // Recursively explore next legs
                     }
                 }
             }
@@ -64,10 +65,10 @@ public class LegListItemModelProvider : ILegListItemModelProvider
 
         // Step 4: Find all paths starting from `fromId` to `toId`
         var visited = new HashSet<string>();
-        FindPaths(filters.From, filters.To, new List<Leg>(), visited);
+        FindPaths(filters.From, filters.To, filters.DepartureDate, new List<Leg>(), visited);
 
         // Step 5: Transform all paths into LegListItemModel
-        var routeList = allPaths.Select(path => new RouteListItemModel
+        return allPaths.Select(path => new RouteListItemModel
         {
             PriceListId = priceList.Id,
             Routes = path.Select(leg => new RouteInfoModel
@@ -97,17 +98,5 @@ public class LegListItemModelProvider : ILegListItemModelProvider
                 }).ToArray()
             }).ToArray() // Convert the list of LegInfoModel into an array
         }).ToImmutableList();
-        // if (!string.IsNullOrEmpty(filters.SortBy))
-        // {
-        //     routeList = filters.SortDirection.ToLower() switch
-        //     {
-        //         "asc" => routeList.OrderBy(x => GetPropertyValue(x, filters.SortBy)).ToList(),
-        //         "desc" => routeList.OrderByDescending(x => GetPropertyValue(x, filters.SortBy)).ToList(),
-        //         _ => routeList // Default to no sorting if SortDirection is invalid
-        //     };
-        // }
-
-        return routeList.ToImmutableList();
-        
     }
 }

@@ -111,6 +111,108 @@ export class ReservationClient extends ClientBase {
         }
         return Promise.resolve<string>(null as any);
     }
+
+    list(lastName: string | undefined): Promise<ReservationListItemModel[]> {
+        let url_ = this.baseUrl + "/Reservation/list?";
+        if (lastName === null)
+            throw new Error("The parameter 'lastName' cannot be null.");
+        else if (lastName !== undefined)
+            url_ += "lastName=" + encodeURIComponent("" + lastName) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "POST",
+            headers: {
+                "Accept": "application/json"
+            }
+        };
+
+        return this.transformOptions(options_).then(transformedOptions_ => {
+            return this.http.fetch(url_, transformedOptions_);
+        }).then((_response: Response) => {
+            return this.transformResult(url_, _response, (_response: Response) => this.processList(_response));
+        });
+    }
+
+    protected processList(response: Response): Promise<ReservationListItemModel[]> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        let _mappings: { source: any, target: any }[] = [];
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : jsonParse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(ReservationListItemModel.fromJS(item, _mappings));
+            }
+            else {
+                result200 = <any>null;
+            }
+            return result200;
+            });
+        } else if (status === 400) {
+            return response.text().then((_responseText) => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : jsonParse(_responseText, this.jsonParseReviver);
+            result400 = BadRequest.fromJS(resultData400, _mappings);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<ReservationListItemModel[]>(null as any);
+    }
+
+    get(id: string): Promise<ReservationDetailsModel> {
+        let url_ = this.baseUrl + "/Reservation/{id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "POST",
+            headers: {
+                "Accept": "application/json"
+            }
+        };
+
+        return this.transformOptions(options_).then(transformedOptions_ => {
+            return this.http.fetch(url_, transformedOptions_);
+        }).then((_response: Response) => {
+            return this.transformResult(url_, _response, (_response: Response) => this.processGet(_response));
+        });
+    }
+
+    protected processGet(response: Response): Promise<ReservationDetailsModel> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        let _mappings: { source: any, target: any }[] = [];
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : jsonParse(_responseText, this.jsonParseReviver);
+            result200 = ReservationDetailsModel.fromJS(resultData200, _mappings);
+            return result200;
+            });
+        } else if (status === 400) {
+            return response.text().then((_responseText) => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : jsonParse(_responseText, this.jsonParseReviver);
+            result400 = BadRequest.fromJS(resultData400, _mappings);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<ReservationDetailsModel>(null as any);
+    }
 }
 
 export class LegClient extends ClientBase {
@@ -168,7 +270,7 @@ export class LegClient extends ClientBase {
         return Promise.resolve<LegListFilterOptionsModel>(null as any);
     }
 
-    legs(from: string | undefined, to: string | undefined, start: Date | undefined, end: Date | undefined): Promise<RouteListItemModel[]> {
+    legs(from: string | undefined, to: string | undefined, departureDate: Date | undefined): Promise<RouteListItemModel[]> {
         let url_ = this.baseUrl + "/Leg/list?";
         if (from === null)
             throw new Error("The parameter 'from' cannot be null.");
@@ -178,14 +280,10 @@ export class LegClient extends ClientBase {
             throw new Error("The parameter 'to' cannot be null.");
         else if (to !== undefined)
             url_ += "To=" + encodeURIComponent("" + to) + "&";
-        if (start === null)
-            throw new Error("The parameter 'start' cannot be null.");
-        else if (start !== undefined)
-            url_ += "Start=" + encodeURIComponent(start ? "" + start.toISOString() : "") + "&";
-        if (end === null)
-            throw new Error("The parameter 'end' cannot be null.");
-        else if (end !== undefined)
-            url_ += "End=" + encodeURIComponent(end ? "" + end.toISOString() : "") + "&";
+        if (departureDate === null)
+            throw new Error("The parameter 'departureDate' cannot be null.");
+        else if (departureDate !== undefined)
+            url_ += "DepartureDate=" + encodeURIComponent(departureDate ? "" + departureDate.toISOString() : "") + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: RequestInit = {
@@ -224,7 +322,7 @@ export class LegClient extends ClientBase {
             return response.text().then((_responseText) => {
             let result400: any = null;
             let resultData400 = _responseText === "" ? null : jsonParse(_responseText, this.jsonParseReviver);
-            result400 = BadRequest.fromJS(resultData400, _mappings);
+            result400 = ValidationResult.fromJS(resultData400, _mappings);
             return throwException("A server side error occurred.", status, _responseText, _headers, result400);
             });
         } else if (status !== 200 && status !== 204) {
@@ -233,6 +331,73 @@ export class LegClient extends ClientBase {
             });
         }
         return Promise.resolve<RouteListItemModel[]>(null as any);
+    }
+
+    legProvidersList(legId: string | undefined, priceListId: string | undefined, priceLimit: number | null | undefined, arriveBy: Date | null | undefined, companyName: string | null | undefined, sortBy: string | null | undefined): Promise<ProviderInfoModel[]> {
+        let url_ = this.baseUrl + "/Leg/filter-providers?";
+        if (legId === null)
+            throw new Error("The parameter 'legId' cannot be null.");
+        else if (legId !== undefined)
+            url_ += "LegId=" + encodeURIComponent("" + legId) + "&";
+        if (priceListId === null)
+            throw new Error("The parameter 'priceListId' cannot be null.");
+        else if (priceListId !== undefined)
+            url_ += "PriceListId=" + encodeURIComponent("" + priceListId) + "&";
+        if (priceLimit !== undefined && priceLimit !== null)
+            url_ += "PriceLimit=" + encodeURIComponent("" + priceLimit) + "&";
+        if (arriveBy !== undefined && arriveBy !== null)
+            url_ += "ArriveBy=" + encodeURIComponent(arriveBy ? "" + arriveBy.toISOString() : "") + "&";
+        if (companyName !== undefined && companyName !== null)
+            url_ += "CompanyName=" + encodeURIComponent("" + companyName) + "&";
+        if (sortBy !== undefined && sortBy !== null)
+            url_ += "SortBy=" + encodeURIComponent("" + sortBy) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "Accept": "application/json"
+            }
+        };
+
+        return this.transformOptions(options_).then(transformedOptions_ => {
+            return this.http.fetch(url_, transformedOptions_);
+        }).then((_response: Response) => {
+            return this.transformResult(url_, _response, (_response: Response) => this.processLegProvidersList(_response));
+        });
+    }
+
+    protected processLegProvidersList(response: Response): Promise<ProviderInfoModel[]> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        let _mappings: { source: any, target: any }[] = [];
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : jsonParse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(ProviderInfoModel.fromJS(item, _mappings));
+            }
+            else {
+                result200 = <any>null;
+            }
+            return result200;
+            });
+        } else if (status === 400) {
+            return response.text().then((_responseText) => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : jsonParse(_responseText, this.jsonParseReviver);
+            result400 = BadRequest.fromJS(resultData400, _mappings);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<ProviderInfoModel[]>(null as any);
     }
 }
 
@@ -385,6 +550,9 @@ export interface IPersonNameModel {
 export class ReservationRouteModel implements IReservationRouteModel {
     companyId?: string;
     legId?: string;
+    price?: number;
+    departure?: Date;
+    arrival?: Date;
 
     constructor(data?: IReservationRouteModel) {
         if (data) {
@@ -399,6 +567,9 @@ export class ReservationRouteModel implements IReservationRouteModel {
         if (_data) {
             this.companyId = _data["companyId"] !== undefined ? _data["companyId"] : <any>null;
             this.legId = _data["legId"] !== undefined ? _data["legId"] : <any>null;
+            this.price = _data["price"] !== undefined ? _data["price"] : <any>null;
+            this.departure = _data["departure"] ? new Date(_data["departure"].toString()) : <any>null;
+            this.arrival = _data["arrival"] ? new Date(_data["arrival"].toString()) : <any>null;
         }
     }
 
@@ -411,6 +582,9 @@ export class ReservationRouteModel implements IReservationRouteModel {
         data = typeof data === 'object' ? data : {};
         data["companyId"] = this.companyId !== undefined ? this.companyId : <any>null;
         data["legId"] = this.legId !== undefined ? this.legId : <any>null;
+        data["price"] = this.price !== undefined ? this.price : <any>null;
+        data["departure"] = this.departure ? this.departure.toISOString() : <any>null;
+        data["arrival"] = this.arrival ? this.arrival.toISOString() : <any>null;
         return data;
     }
 
@@ -425,11 +599,179 @@ export class ReservationRouteModel implements IReservationRouteModel {
 export interface IReservationRouteModel {
     companyId?: string;
     legId?: string;
+    price?: number;
+    departure?: Date;
+    arrival?: Date;
+}
+
+export class ReservationListItemModel implements IReservationListItemModel {
+    id?: string;
+    name?: PersonNameModel;
+    from?: string;
+    to?: string;
+
+    constructor(data?: IReservationListItemModel) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any, _mappings?: any) {
+        if (_data) {
+            this.id = _data["id"] !== undefined ? _data["id"] : <any>null;
+            this.name = _data["name"] ? PersonNameModel.fromJS(_data["name"], _mappings) : <any>null;
+            this.from = _data["from"] !== undefined ? _data["from"] : <any>null;
+            this.to = _data["to"] !== undefined ? _data["to"] : <any>null;
+        }
+    }
+
+    static fromJS(data: any, _mappings?: any): ReservationListItemModel | null {
+        data = typeof data === 'object' ? data : {};
+        return createInstance<ReservationListItemModel>(data, _mappings, ReservationListItemModel);
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id !== undefined ? this.id : <any>null;
+        data["name"] = this.name ? this.name.toJSON() : <any>null;
+        data["from"] = this.from !== undefined ? this.from : <any>null;
+        data["to"] = this.to !== undefined ? this.to : <any>null;
+        return data;
+    }
+
+    clone(): ReservationListItemModel {
+        const json = this.toJSON();
+        let result = new ReservationListItemModel();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IReservationListItemModel {
+    id?: string;
+    name?: PersonNameModel;
+    from?: string;
+    to?: string;
+}
+
+export class ReservationDetailsModel implements IReservationDetailsModel {
+    id?: string;
+    customer?: PersonNameModel;
+    routes?: ReservationRouteDetailsModel[];
+
+    constructor(data?: IReservationDetailsModel) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any, _mappings?: any) {
+        if (_data) {
+            this.id = _data["id"] !== undefined ? _data["id"] : <any>null;
+            this.customer = _data["customer"] ? PersonNameModel.fromJS(_data["customer"], _mappings) : <any>null;
+            if (Array.isArray(_data["routes"])) {
+                this.routes = [] as any;
+                for (let item of _data["routes"])
+                    this.routes!.push(ReservationRouteDetailsModel.fromJS(item, _mappings));
+            }
+            else {
+                this.routes = <any>null;
+            }
+        }
+    }
+
+    static fromJS(data: any, _mappings?: any): ReservationDetailsModel | null {
+        data = typeof data === 'object' ? data : {};
+        return createInstance<ReservationDetailsModel>(data, _mappings, ReservationDetailsModel);
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id !== undefined ? this.id : <any>null;
+        data["customer"] = this.customer ? this.customer.toJSON() : <any>null;
+        if (Array.isArray(this.routes)) {
+            data["routes"] = [];
+            for (let item of this.routes)
+                data["routes"].push(item.toJSON());
+        }
+        return data;
+    }
+
+    clone(): ReservationDetailsModel {
+        const json = this.toJSON();
+        let result = new ReservationDetailsModel();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IReservationDetailsModel {
+    id?: string;
+    customer?: PersonNameModel;
+    routes?: ReservationRouteDetailsModel[];
+}
+
+export class ReservationRouteDetailsModel implements IReservationRouteDetailsModel {
+    time?: string;
+    price?: number;
+    from?: string;
+    to?: string;
+
+    constructor(data?: IReservationRouteDetailsModel) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any, _mappings?: any) {
+        if (_data) {
+            this.time = _data["time"] !== undefined ? _data["time"] : <any>null;
+            this.price = _data["price"] !== undefined ? _data["price"] : <any>null;
+            this.from = _data["from"] !== undefined ? _data["from"] : <any>null;
+            this.to = _data["to"] !== undefined ? _data["to"] : <any>null;
+        }
+    }
+
+    static fromJS(data: any, _mappings?: any): ReservationRouteDetailsModel | null {
+        data = typeof data === 'object' ? data : {};
+        return createInstance<ReservationRouteDetailsModel>(data, _mappings, ReservationRouteDetailsModel);
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["time"] = this.time !== undefined ? this.time : <any>null;
+        data["price"] = this.price !== undefined ? this.price : <any>null;
+        data["from"] = this.from !== undefined ? this.from : <any>null;
+        data["to"] = this.to !== undefined ? this.to : <any>null;
+        return data;
+    }
+
+    clone(): ReservationRouteDetailsModel {
+        const json = this.toJSON();
+        let result = new ReservationRouteDetailsModel();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IReservationRouteDetailsModel {
+    time?: string;
+    price?: number;
+    from?: string;
+    to?: string;
 }
 
 export class LegListFilterOptionsModel implements ILegListFilterOptionsModel {
     locations?: LocationModel[];
-    companies?: CompanyModel[];
 
     constructor(data?: ILegListFilterOptionsModel) {
         if (data) {
@@ -450,14 +792,6 @@ export class LegListFilterOptionsModel implements ILegListFilterOptionsModel {
             else {
                 this.locations = <any>null;
             }
-            if (Array.isArray(_data["companies"])) {
-                this.companies = [] as any;
-                for (let item of _data["companies"])
-                    this.companies!.push(CompanyModel.fromJS(item, _mappings));
-            }
-            else {
-                this.companies = <any>null;
-            }
         }
     }
 
@@ -473,11 +807,6 @@ export class LegListFilterOptionsModel implements ILegListFilterOptionsModel {
             for (let item of this.locations)
                 data["locations"].push(item.toJSON());
         }
-        if (Array.isArray(this.companies)) {
-            data["companies"] = [];
-            for (let item of this.companies)
-                data["companies"].push(item.toJSON());
-        }
         return data;
     }
 
@@ -491,7 +820,6 @@ export class LegListFilterOptionsModel implements ILegListFilterOptionsModel {
 
 export interface ILegListFilterOptionsModel {
     locations?: LocationModel[];
-    companies?: CompanyModel[];
 }
 
 export class LocationModel implements ILocationModel {
@@ -535,51 +863,6 @@ export class LocationModel implements ILocationModel {
 }
 
 export interface ILocationModel {
-    id?: string;
-    name?: string;
-}
-
-export class CompanyModel implements ICompanyModel {
-    id?: string;
-    name?: string;
-
-    constructor(data?: ICompanyModel) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any, _mappings?: any) {
-        if (_data) {
-            this.id = _data["id"] !== undefined ? _data["id"] : <any>null;
-            this.name = _data["name"] !== undefined ? _data["name"] : <any>null;
-        }
-    }
-
-    static fromJS(data: any, _mappings?: any): CompanyModel | null {
-        data = typeof data === 'object' ? data : {};
-        return createInstance<CompanyModel>(data, _mappings, CompanyModel);
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id !== undefined ? this.id : <any>null;
-        data["name"] = this.name !== undefined ? this.name : <any>null;
-        return data;
-    }
-
-    clone(): CompanyModel {
-        const json = this.toJSON();
-        let result = new CompanyModel();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface ICompanyModel {
     id?: string;
     name?: string;
 }
@@ -645,6 +928,7 @@ export class RouteInfoModel implements IRouteInfoModel {
     from?: LegInfoModel;
     to?: LegInfoModel;
     providers?: ProviderInfoModel[];
+    averagePrice?: number;
 
     constructor(data?: IRouteInfoModel) {
         if (data) {
@@ -668,6 +952,7 @@ export class RouteInfoModel implements IRouteInfoModel {
             else {
                 this.providers = <any>null;
             }
+            this.averagePrice = _data["averagePrice"] !== undefined ? _data["averagePrice"] : <any>null;
         }
     }
 
@@ -686,6 +971,7 @@ export class RouteInfoModel implements IRouteInfoModel {
             for (let item of this.providers)
                 data["providers"].push(item.toJSON());
         }
+        data["averagePrice"] = this.averagePrice !== undefined ? this.averagePrice : <any>null;
         return data;
     }
 
@@ -702,6 +988,7 @@ export interface IRouteInfoModel {
     from?: LegInfoModel;
     to?: LegInfoModel;
     providers?: ProviderInfoModel[];
+    averagePrice?: number;
 }
 
 export class LegInfoModel implements ILegInfoModel {
@@ -849,6 +1136,163 @@ export class CompanyInfoModel implements ICompanyInfoModel {
 export interface ICompanyInfoModel {
     id?: string;
     name?: string;
+}
+
+export class ValidationResult implements IValidationResult {
+    isValid?: boolean;
+    errors?: ValidationFailure[] | null;
+    ruleSetsExecuted?: string[] | null;
+
+    constructor(data?: IValidationResult) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any, _mappings?: any) {
+        if (_data) {
+            this.isValid = _data["isValid"] !== undefined ? _data["isValid"] : <any>null;
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(ValidationFailure.fromJS(item, _mappings));
+            }
+            else {
+                this.errors = <any>null;
+            }
+            if (Array.isArray(_data["ruleSetsExecuted"])) {
+                this.ruleSetsExecuted = [] as any;
+                for (let item of _data["ruleSetsExecuted"])
+                    this.ruleSetsExecuted!.push(item);
+            }
+            else {
+                this.ruleSetsExecuted = <any>null;
+            }
+        }
+    }
+
+    static fromJS(data: any, _mappings?: any): ValidationResult | null {
+        data = typeof data === 'object' ? data : {};
+        return createInstance<ValidationResult>(data, _mappings, ValidationResult);
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["isValid"] = this.isValid !== undefined ? this.isValid : <any>null;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item.toJSON());
+        }
+        if (Array.isArray(this.ruleSetsExecuted)) {
+            data["ruleSetsExecuted"] = [];
+            for (let item of this.ruleSetsExecuted)
+                data["ruleSetsExecuted"].push(item);
+        }
+        return data;
+    }
+
+    clone(): ValidationResult {
+        const json = this.toJSON();
+        let result = new ValidationResult();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IValidationResult {
+    isValid?: boolean;
+    errors?: ValidationFailure[] | null;
+    ruleSetsExecuted?: string[] | null;
+}
+
+export class ValidationFailure implements IValidationFailure {
+    propertyName?: string | null;
+    errorMessage?: string | null;
+    attemptedValue?: any | null;
+    customState?: any | null;
+    severity?: Severity;
+    errorCode?: string | null;
+    formattedMessagePlaceholderValues?: { [key: string]: any; } | null;
+
+    constructor(data?: IValidationFailure) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any, _mappings?: any) {
+        if (_data) {
+            this.propertyName = _data["propertyName"] !== undefined ? _data["propertyName"] : <any>null;
+            this.errorMessage = _data["errorMessage"] !== undefined ? _data["errorMessage"] : <any>null;
+            this.attemptedValue = _data["attemptedValue"] !== undefined ? _data["attemptedValue"] : <any>null;
+            this.customState = _data["customState"] !== undefined ? _data["customState"] : <any>null;
+            this.severity = _data["severity"] !== undefined ? _data["severity"] : <any>null;
+            this.errorCode = _data["errorCode"] !== undefined ? _data["errorCode"] : <any>null;
+            if (_data["formattedMessagePlaceholderValues"]) {
+                this.formattedMessagePlaceholderValues = {} as any;
+                for (let key in _data["formattedMessagePlaceholderValues"]) {
+                    if (_data["formattedMessagePlaceholderValues"].hasOwnProperty(key))
+                        (<any>this.formattedMessagePlaceholderValues)![key] = _data["formattedMessagePlaceholderValues"][key] !== undefined ? _data["formattedMessagePlaceholderValues"][key] : <any>null;
+                }
+            }
+            else {
+                this.formattedMessagePlaceholderValues = <any>null;
+            }
+        }
+    }
+
+    static fromJS(data: any, _mappings?: any): ValidationFailure | null {
+        data = typeof data === 'object' ? data : {};
+        return createInstance<ValidationFailure>(data, _mappings, ValidationFailure);
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["propertyName"] = this.propertyName !== undefined ? this.propertyName : <any>null;
+        data["errorMessage"] = this.errorMessage !== undefined ? this.errorMessage : <any>null;
+        data["attemptedValue"] = this.attemptedValue !== undefined ? this.attemptedValue : <any>null;
+        data["customState"] = this.customState !== undefined ? this.customState : <any>null;
+        data["severity"] = this.severity !== undefined ? this.severity : <any>null;
+        data["errorCode"] = this.errorCode !== undefined ? this.errorCode : <any>null;
+        if (this.formattedMessagePlaceholderValues) {
+            data["formattedMessagePlaceholderValues"] = {};
+            for (let key in this.formattedMessagePlaceholderValues) {
+                if (this.formattedMessagePlaceholderValues.hasOwnProperty(key))
+                    (<any>data["formattedMessagePlaceholderValues"])[key] = this.formattedMessagePlaceholderValues[key] !== undefined ? this.formattedMessagePlaceholderValues[key] : <any>null;
+            }
+        }
+        return data;
+    }
+
+    clone(): ValidationFailure {
+        const json = this.toJSON();
+        let result = new ValidationFailure();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IValidationFailure {
+    propertyName?: string | null;
+    errorMessage?: string | null;
+    attemptedValue?: any | null;
+    customState?: any | null;
+    severity?: Severity;
+    errorCode?: string | null;
+    formattedMessagePlaceholderValues?: { [key: string]: any; } | null;
+}
+
+export enum Severity {
+    Error = 0,
+    Warning = 1,
+    Info = 2,
 }
 
 function jsonParse(json: any, reviver?: any) {

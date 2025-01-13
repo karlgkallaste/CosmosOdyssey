@@ -3,5 +3,4 @@
 public class LegListFilterOptionsModel
 {
     public LocationModel[] Locations { get; set; } = [];
-    public CompanyModel[] Companies { get; set; } = [];
 }

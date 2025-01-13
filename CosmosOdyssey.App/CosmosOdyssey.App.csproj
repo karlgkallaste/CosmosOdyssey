@@ -27,15 +27,11 @@
 
     <ItemGroup>
         <ProjectReference Include="..\CosmosOdyssey.Data\CosmosOdyssey.Data.csproj"/>
-        <ProjectReference Include="..\CosmosOdyssey.Services\CosmosOdyssey.Services.csproj"/>
+        <ProjectReference Include="..\CosmosOdyssey.Services\CosmosOdyssey.Services.csproj" />
     </ItemGroup>
 
     <ItemGroup>
       <None Remove="Generated\ApiClient.ts" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Features\Reservations\Models\" />
     </ItemGroup>
 
 </Project>

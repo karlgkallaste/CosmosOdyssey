@@ -3,6 +3,7 @@ using CosmosOdyssey.Domain.Features.Legs;
 using CosmosOdyssey.Domain.Features.PriceLists;
 using FluentAssertions;
 using MediatR;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using Moq.Protected;
@@ -23,10 +24,11 @@ public class PriceListServiceTests
         _priceListBuilderMock = new Mock<PriceList.IBuilder>();
         _priceListLegBuilderMock = new Mock<Leg.IBuilder>();
         _priceListRepositoryMock = new Mock<IRepository<PriceList>>();
+        
 
         var httpClient = new HttpClient(_httpMessageHandlerMock.Object);
-        _sut = new PriceListServices.PriceListService(httpClient, _apiSettingsMock.Object, _mediatorMock.Object,
-            _priceListBuilderMock.Object, _priceListLegBuilderMock.Object, _priceListRepositoryMock.Object);
+        _sut = new Services.PriceListService(httpClient, _apiSettingsMock.Object, _mediatorMock.Object,
+            _priceListBuilderMock.Object, _priceListLegBuilderMock.Object, _priceListRepositoryMock.Object, new Mock<ILogger<Services.PriceListService>>().Object);
     }
 
     private string _apiUrl = null!;
@@ -36,7 +38,7 @@ public class PriceListServiceTests
     private Mock<PriceList.IBuilder> _priceListBuilderMock;
     private Mock<Leg.IBuilder> _priceListLegBuilderMock;
     private Mock<IRepository<PriceList>> _priceListRepositoryMock;
-    private PriceListServices.PriceListService _sut;
+    private Services.PriceListService _sut;
 
     [Test]
     public async Task GetLatestPriceList_Returns_Error_If_Request_Results_In_Bad_Request()

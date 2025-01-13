@@ -11,6 +11,7 @@ export default defineComponent({
     return {
       from: "",
       to: "",
+      departDate: {} as Date | undefined,
       options: new LegListFilterOptionsModel,
     }
   },
@@ -21,15 +22,19 @@ export default defineComponent({
     })
   },
   methods: {
-    handleValuesReady(payload: { from: string, to: string }) {
+    handleValuesReady(payload: { from: string, to: string, departDate: Date }) {
       this.from = payload.from;
       this.to = payload.to;
+      this.departDate = payload.departDate;
       // Navigate to the 'Legs' route with the from and to parameters from the payload
     },
     navigateToLegsList() {
+      if (this.from === "" || this.to === "" || this.departDate == undefined){
+        return this.$toast.add({severity: 'info', summary: 'Info', detail: "Journey incomplete", life: 3000});
+      }
       this.$router.push({
-        name: 'Legs',
-        params: {from: this.from, to: this.to}
+        name: 'Journey',
+        query: {from: this.from, to: this.to, departDate: this.departDate ? this.departDate.toISOString() : undefined},
       });
     }
   }
@@ -37,46 +42,46 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="grid place-items-center m-1 sm:m-1 lg:m-5">
-    <div class="relative text-center mt-10 sm:mt-20 px-4 sm:px-6">
+  <div class="grid place-items-center m-2 lg:m-2">
+    <!-- Header Section -->
+    <div class="relative text-center mt-5 sm:mt-24 px-6 sm:px-10 lg:px-14">
       <!-- Blur Background -->
-      <div class="absolute inset-0 bg-white opacity-10 blur-3xl -z-10 sm:scale-150 scale-100"></div>
+      <div class="absolute inset-0 bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-500 opacity-20 blur-3xl -z-10 scale-125"></div>
 
       <!-- Foreground Content -->
-      <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-indigo-400 mb-6 font-mono">
+      <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-indigo-600 tracking-tight mb-8 font-sans">
         Your Journey Awaits
       </h1>
-      <hr class="mb-6 sm:mb-10">
-      <p class="text-sm sm:text-base lg:text-lg text-gray-100 max-w-xl mx-auto font-mono">
-        Welcome aboard <span class="font-bold text-indigo-200">Space Odyssey</span>, the ultimate app for travelers
+      <p class="text-base sm:text-lg lg:text-xl text-gray-200 max-w-2xl mx-auto leading-relaxed font-sans">
+        Welcome aboard <span class="font-semibold text-indigo-300">Space Odyssey</span>, the ultimate app for travelers
         seeking to explore the wonders of the universe. Whether you’re a seasoned space traveler or a curious wanderer,
-        our platform offers seamless journeys between planets, solar systems, and galaxies. With just a few taps, you’ll
-        be able to plan your voyage, book your travel, and explore the endless beauty of space.
+        our platform offers seamless journeys between planets, solar systems, and galaxies. Plan your voyage, book your
+        travel, and discover the endless beauty of space.
       </p>
-      <hr class="mt-6 sm:mt-10">
+      <hr class="border-t border-indigo-600 opacity-50 my-8 sm:my-12 w-1/2 mx-auto">
     </div>
 
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-3 mt-6 sm:mt-10 w-full px-4">
-      <!-- Fare Picker with Button below it -->
-      <div class="col-span-3 sm:col-span-3 flex flex-col gap-4 w-full mx-auto">
+    <!-- Fare Picker Section -->
+    <div class="grid grid-cols-2 gap-2 sm:grid-cols-3 mt-5 sm:mt-20 w-full px-8">
+      <div class="col-span-3 flex flex-col gap-8 items-center">
+        <!-- Fare-picker container with white background -->
         <fare-picker
             :locations="options.locations"
             @values-ready="handleValuesReady"
-            class="w-full font-mono"
+            class="w-full max-w-3xl bg-white rounded-lg shadow-xl p-8 font-sans"
+            style="overflow: hidden;"
         />
-        <!-- Button directly under the fare-picker, constrained to the same width -->
         <Button
             @click="navigateToLegsList"
             type="button"
-            label="Find fares"
+            label="Find Fares"
             icon="pi pi-search"
-            iconPos="top"
-            class="w-full sm:w-full max-w-[500px] bg-indigo-400 font-mono font-bold mt-5 h-14 sm:h-16 lg:h-20 text-white hover:bg-indigo-700 mx-auto"
+            iconPos="left"
+            class="w-full max-w-3xl bg-indigo-600 text-white text-lg font-semibold py-5 rounded-lg shadow-lg hover:bg-indigo-700 hover:scale-105 transform transition-transform duration-200 ease-in-out"
         />
       </div>
     </div>
   </div>
-
 </template>
 
 <style scoped>

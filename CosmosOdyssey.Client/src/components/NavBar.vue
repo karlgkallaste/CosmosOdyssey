@@ -38,6 +38,13 @@ export default defineComponent({
             this.$router.push('/about');
           }
         },
+        {
+          label: 'Reservations',
+          icon: 'pi pi-list',
+          command: () => {
+            this.$router.push('/reservations');
+          }
+        },
       ]
     };
   }

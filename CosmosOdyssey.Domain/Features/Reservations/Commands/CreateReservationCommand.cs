@@ -58,6 +58,8 @@ public class CreateReservationCommand : IRequest<Result<Guid>>
                     From = routeLeg.Route.From.Name,
                     To = routeLeg.Route.To.Name,
                     Price = company.Price,
+                    Arrival = company.FlightEnd,
+                    Depart = company.FlightStart
                 });
             }
 
