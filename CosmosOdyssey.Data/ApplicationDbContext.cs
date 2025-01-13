@@ -4,6 +4,7 @@ using CosmosOdyssey.Domain.Features.Reservations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 
 namespace CosmosOdyssey.Data;
@@ -38,44 +39,38 @@ public class ApplicationDbContext : DbContext
                 x => JsonConvert.DeserializeObject<List<Leg>>(x) ?? new List<Leg>());
 
 
+        // Reservation Configuration
         modelBuilder.Entity<Reservation>(entity =>
         {
-            // Primary key for Reservation
             entity.HasKey(r => r.Id);
 
-            // Configure the foreign key for PriceList
             entity.HasOne<PriceList>()
                 .WithMany() // Assuming PriceList can have many Reservations
                 .HasForeignKey(r => r.PriceListId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-
-            // Configure the relationship with Customer
             entity.HasOne(r => r.Customer)
                 .WithMany()
                 .HasForeignKey(r => r.CustomerId)
                 .OnDelete(DeleteBehavior.Restrict);
+
             entity.HasMany(r => r.Routes)
                 .WithOne(route => route.Reservation)
                 .HasForeignKey(route => route.ReservationId)
                 .OnDelete(DeleteBehavior.Cascade); // Cascade delete Routes when Reservation is deleted
         });
 
+        // ReservationRoute Configuration
         modelBuilder.Entity<ReservationRoute>(entity =>
         {
             // Primary key for ReservationRoute
-            entity.HasKey(route => route.Id);
+            entity.HasKey(route => route.Id); // Keep Id as the primary key
 
-            // Define the relationship with Reservation
+            // Define the foreign key for Reservation
             entity.HasOne(route => route.Reservation)
                 .WithMany(reservation => reservation.Routes)
                 .HasForeignKey(route => route.ReservationId)
                 .OnDelete(DeleteBehavior.Cascade);
-
-            // Unique constraint on ReservationId, From, and To
-            entity.HasIndex(route => new { route.ReservationId, route.From, route.To })
-                .IsUnique()
-                .HasDatabaseName("IX_ReservationRoute_UniqueFromToPerReservation");
         });
     }
 }

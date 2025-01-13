@@ -1,4 +1,5 @@
 ﻿using CosmosOdyssey.App.Features.Legs.Models;
+using CosmosOdyssey.Domain.Features.Companies;
 using CosmosOdyssey.Domain.Features.Legs;
 using CosmosOdyssey.Domain.Features.PriceLists;
 using CosmosOdyssey.Domain.Features.Routes;
@@ -55,19 +56,35 @@ public class LegListItemModelProviderTests
     {
         var priceList = Builder<PriceList>.CreateNew().With(x => x.Legs, new[]
             {
-                Builder<Leg>.CreateNew().With(x => x.Route,
+                Builder<Leg>.CreateNew().With(x => x.Providers, new[]
+                        {
+                            Builder<Provider>.CreateNew()
+                                .With(x => x.Company, new Company(Guid.NewGuid(), "Comp1"))
+                                .With(x => x.FlightEnd, DateTime.Now.AddDays(1)).Build()
+                        }.ToList()
+                    ).With(x => x.Route,
                         Builder<Route>.CreateNew()
                             .With(x => x.To, new RouteLocation(Guid.NewGuid(), "C"))
                             .With(x => x.From, new RouteLocation(Guid.NewGuid(), "A"))
                             .Build())
                     .Build(),
-                Builder<Leg>.CreateNew().With(x => x.Route,
+                Builder<Leg>.CreateNew().With(x => x.Providers, new[]
+                    {
+                        Builder<Provider>.CreateNew().With(x => x.Company, new Company(Guid.NewGuid(), "Comp2"))
+                            .With(x => x.FlightEnd, DateTime.Now.AddDays(3))
+                            .With(x => x.FlightStart, DateTime.Now.AddDays(2)).Build()
+                    }.ToList()).With(x => x.Route,
                         Builder<Route>.CreateNew()
                             .With(x => x.To, new RouteLocation(Guid.NewGuid(), "E"))
                             .With(x => x.From, new RouteLocation(Guid.NewGuid(), "C"))
                             .Build())
                     .Build(),
-                Builder<Leg>.CreateNew().With(x => x.Route,
+                Builder<Leg>.CreateNew().With(x => x.Providers, new[]
+                    {
+                        Builder<Provider>.CreateNew().With(x => x.Company, new Company(Guid.NewGuid(), "Comp2"))
+                            .With(x => x.FlightEnd, DateTime.Now.AddDays(3))
+                            .With(x => x.FlightStart, DateTime.Now.AddDays(2)).Build()
+                    }.ToList()).With(x => x.Route,
                         Builder<Route>.CreateNew()
                             .With(x => x.To, new RouteLocation(Guid.NewGuid(), "E"))
                             .With(x => x.From, new RouteLocation(Guid.NewGuid(), "A"))
@@ -90,7 +107,7 @@ public class LegListItemModelProviderTests
         result[0].Routes[0].To.Name.Should().Be("C");
         result[0].Routes[1].From.Name.Should().Be("C");
         result[0].Routes[1].To.Name.Should().Be("E");
-        
+
         result[1].PriceListId.Should().Be(priceList.Id);
         result[1].Routes[0].To.Name.Should().Be("E");
         result[1].Routes[0].From.Name.Should().Be("A");

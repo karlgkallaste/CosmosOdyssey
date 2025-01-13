@@ -71,9 +71,11 @@ namespace CosmosOdyssey.Data.Migrations
                     ReservationId = table.Column<Guid>(type: "uuid", nullable: false),
                     From = table.Column<string>(type: "text", nullable: false),
                     To = table.Column<string>(type: "text", nullable: false),
-                    TotalTimeInMinutes = table.Column<long>(type: "bigint", nullable: false),
+                    TotalTimeInMinutes = table.Column<double>(type: "double precision", nullable: false),
                     Price = table.Column<double>(type: "double precision", nullable: false),
-                    Company = table.Column<string>(type: "text", nullable: false)
+                    Company = table.Column<string>(type: "text", nullable: false),
+                    Arrival = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Depart = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -87,10 +89,9 @@ namespace CosmosOdyssey.Data.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_ReservationRoute_UniqueFromToPerReservation",
+                name: "IX_ReservationRoute_ReservationId",
                 table: "ReservationRoute",
-                columns: new[] { "ReservationId", "From", "To" },
-                unique: true);
+                column: "ReservationId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Reservations_CustomerId",

@@ -42,7 +42,7 @@ export default defineComponent({
           label: 'Reservations',
           icon: 'pi pi-list',
           command: () => {
-            this.$router.push('/reservations');
+            this.$router.push('/reservation/list');
           }
         },
       ]

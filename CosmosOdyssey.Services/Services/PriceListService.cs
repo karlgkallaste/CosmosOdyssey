@@ -3,6 +3,7 @@ using System.Text.Json;
 using CosmosOdyssey.Domain.Features.Legs;
 using CosmosOdyssey.Domain.Features.PriceLists;
 using CosmosOdyssey.Domain.Features.PriceLists.Commands;
+using CosmosOdyssey.Domain.Specifications;
 using CosmosOdyssey.Services.PriceListServices.Models;
 using FluentResults;
 using Hangfire;
@@ -15,6 +16,7 @@ namespace CosmosOdyssey.Services.Services;
 public interface IPriceListService
 {
     Task<Result> GetLatestPriceList();
+    Task<Result> DeleteExcess();
 }
 
 public class PriceListService : IPriceListService
@@ -28,7 +30,8 @@ public class PriceListService : IPriceListService
     private readonly IOptions<ApiSettings> _apiSettings;
 
     public PriceListService(HttpClient httpClient, IOptions<ApiSettings> apiSettings, IMediator mediator,
-        PriceList.IBuilder priceListBuilder, Leg.IBuilder priceListLegBuilder, IRepository<PriceList> priceListRepository, ILogger<PriceListService> logger)
+        PriceList.IBuilder priceListBuilder, Leg.IBuilder priceListLegBuilder,
+        IRepository<PriceList> priceListRepository, ILogger<PriceListService> logger)
     {
         _httpClient = httpClient;
         _mediator = mediator;
@@ -46,13 +49,15 @@ public class PriceListService : IPriceListService
 
         if (response.StatusCode == HttpStatusCode.BadRequest)
         {
-            _logger.LogError("[{Name}] Response status code: {StatusCode}. Content: {Content}", nameof(GetLatestPriceList), response.StatusCode, responseContent);
+            _logger.LogError("[{Name}] Response status code: {StatusCode}. Content: {Content}",
+                nameof(GetLatestPriceList), response.StatusCode, responseContent);
             return Result.Fail("Query failed");
         }
 
         if (response.StatusCode == HttpStatusCode.InternalServerError)
         {
-            _logger.LogError("[{Name}] Response status code: {StatusCode}. Content: {Content}", nameof(GetLatestPriceList), response.StatusCode, responseContent);
+            _logger.LogError("[{Name}] Response status code: {StatusCode}. Content: {Content}",
+                nameof(GetLatestPriceList), response.StatusCode, responseContent);
             return Result.Fail("Server error");
         }
 
@@ -62,7 +67,8 @@ public class PriceListService : IPriceListService
 
         if (modelFromResponse == null)
         {
-            _logger.LogError("[{Name}] Failed to deserialize. Content: {Content}", nameof(GetLatestPriceList), responseContent);
+            _logger.LogError("[{Name}] Failed to deserialize. Content: {Content}", nameof(GetLatestPriceList),
+                responseContent);
             return Result.Fail("Failed to deserialize");
         }
 
@@ -82,18 +88,39 @@ public class PriceListService : IPriceListService
 
         var existingPriceList = await _priceListRepository.GetByIdAsync(modelFromResponse.Id);
 
-        if (existingPriceList != null )
+        if (existingPriceList != null)
         {
-            _logger.LogError("[{Name}] Tried to create duplicate price list {Id}", nameof(GetLatestPriceList), modelFromResponse.Id);
+            _logger.LogError("[{Name}] Tried to create duplicate price list {Id}", nameof(GetLatestPriceList),
+                modelFromResponse.Id);
             return Result.Fail("Price List already exists");
         }
-        
+
         var result = await _mediator.Send(new CreatePriceListCommand(priceList));
         if (result.IsFailed) throw new Exception("Failed to create price list");
 
-        // TODO FIGURE OUT
-        
-        BackgroundJob.Schedule(() => GetLatestPriceList(), new DateTimeOffset(modelFromResponse.ValidUntil, DateTimeOffset.Now.Offset));
+        BackgroundJob.Schedule(() => GetLatestPriceList(), new DateTimeOffset(modelFromResponse.ValidUntil));
+        return Result.Ok();
+    }
+
+    public async Task<Result> DeleteExcess()
+    {
+        var priceLists = await _priceListRepository.FindAsync(Specification<PriceList>.None);
+        if (priceLists.Count <= 15)
+        {
+            return Result.Ok();
+        }
+
+        var priceListsToDelete = priceLists
+            .OrderBy(pl => pl.ValidUntil)
+            .Take(priceLists.Count - 15)
+            .ToList();
+        var result = await _priceListRepository.DeleteRangeAsync(priceListsToDelete);
+        if (result.IsFailed)
+        {
+            _logger.LogError("Failed to delete price lists");
+            return Result.Fail(result.Errors);
+        }
+
         return Result.Ok();
     }
 }

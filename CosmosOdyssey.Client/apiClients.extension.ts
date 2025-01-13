@@ -18,18 +18,8 @@ export class ClientBase {
 
     protected transformResult(url: any, response: any, handleResponse: any): any {
 
-        if (response.status == 401) {
-            return;
-        }
-        if (response.status == 409) {
-            if (!this._handleGlobalConflict) {
-                return Promise.reject(response);
-            }
-            window.alert("Ressurss on vahepeal muutunud, palun värskendage lehte.");
-            return Promise.reject(response);
-        }
         if (response.status == 500) {
-            if (confirm("Midagi läks valesti. Kas värskendan lehte?")) {
+            if (confirm("Something went wrong. Refresh the page?")) {
                 location.reload();
                 return;
             }

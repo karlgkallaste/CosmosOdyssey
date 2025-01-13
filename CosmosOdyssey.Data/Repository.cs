@@ -59,6 +59,22 @@ public class Repository<T> : IRepository<T> where T : class, IEntity
         return await query.ToListAsync();
     }
 
+    public async Task<Result> DeleteRangeAsync(List<T> entities)
+    {
+        try
+        {
+            _context.Set<T>().RemoveRange(entities);
+        }
+        catch (Exception ex)
+        {
+            return Result.Fail($"An error occurred while deleting the entities: {ex.Message}");
+        }
+
+        await _context.SaveChangesAsync();
+
+        return Result.Ok();
+    }
+
 
     private IQueryable<T> ApplyEagerLoading(IQueryable<T> query)
     {

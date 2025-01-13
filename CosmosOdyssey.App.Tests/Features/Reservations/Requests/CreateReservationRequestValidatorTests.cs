@@ -84,7 +84,43 @@ public class CreateReservationRequestValidatorTests
 
         // Assert
         result.ShouldHaveValidationErrorFor(x => x.Routes)
-            .WithErrorMessage("Routes cannot be empty");
+            .WithErrorMessage("'Routes' must not be empty.");
+    }
+
+    [Test]
+    public void Validator_returns_error_when_routes_are_invalid()
+    {
+        var request = new CreateReservationRequest
+        {
+            PriceListId = Guid.NewGuid(),
+            Name = new PersonNameModel("John", "Doe"),
+            Routes = new []
+            {
+                new ReservationRouteModel()
+                {
+                    Arrival = DateTimeOffset.Now.AddDays(1),
+                    Departure = DateTimeOffset.Now.AddDays(2),
+                    CompanyId = Guid.NewGuid(),
+                    LegId = Guid.NewGuid(),
+                    Price = 2
+                },
+                new ReservationRouteModel()
+                {
+                    Arrival = DateTimeOffset.Now.AddDays(1),
+                    Departure = DateTimeOffset.Now.AddDays(-1),
+                    CompanyId = Guid.NewGuid(),
+                    LegId = Guid.NewGuid(),
+                    Price = 2
+                }
+            }
+        };
+
+        // Act
+        var result = _validator.TestValidate(request);
+
+        // Assert
+        result.ShouldHaveValidationErrorFor(x => x.Routes)
+            .WithErrorMessage("Each route's start time must be greater than the last arrival time of the previous route.");
     }
 
     [Test]

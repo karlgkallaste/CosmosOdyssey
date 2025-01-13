@@ -94,14 +94,12 @@ namespace CosmosOdyssey.Data.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<long>("TotalTimeInMinutes")
-                        .HasColumnType("bigint");
+                    b.Property<double>("TotalTimeInMinutes")
+                        .HasColumnType("double precision");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ReservationId", "From", "To")
-                        .IsUnique()
-                        .HasDatabaseName("IX_ReservationRoute_UniqueFromToPerReservation");
+                    b.HasIndex("ReservationId");
 
                     b.ToTable("ReservationRoute");
                 });

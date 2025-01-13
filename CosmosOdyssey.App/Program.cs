@@ -57,6 +57,8 @@ using (var scope = app.Services.CreateScope())
     var priceListService = scope.ServiceProvider.GetRequiredService<IPriceListService>();
 
     BackgroundJob.Enqueue(() => priceListService.GetLatestPriceList());
+    RecurringJob.AddOrUpdate<IPriceListService>("DeleteExcessPriceLists", service => service.DeleteExcess(), "*/30 * * * *" // At every 30th minute
+    );
 }
 
 app.UseAuthorization();
