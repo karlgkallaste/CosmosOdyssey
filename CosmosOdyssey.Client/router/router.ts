@@ -1,10 +1,11 @@
 ﻿import {createRouter, createWebHistory} from "vue-router";
-import Home from "../src/views/Home.vue"; // Example of a view/component import
-import About from "../src/views/About.vue"; // Example of a view/component import
-import Legs from "../src/views/Legs.vue"; // Example of a view/component import
-import Reservation from "../src/views/Reservation.vue"; // Example of a view/component import
+import Home from "../src/views/Home.vue";
+import About from "../src/views/About.vue";
+import Reservation from "../src/views/Reservation.vue";
+import ReservationList from "../src/views/ReservationList.vue";
+import Journey from "../src/views/Journey.vue";
 
-// Define your routes
+
 const routes = [
     {
         path: "/",
@@ -17,22 +18,27 @@ const routes = [
         component: About,
     },
     {
-        path: '/legs/from:from/to:to',
-        name: 'Legs',
-        component: Legs,
+        path: '/journey',
+        name: 'Journey',
+        component: Journey,
         props: true
     },
     {
-        path: '/reservation/:id',
+        path: '/reservation',
         name: 'Reservation',
         component: Reservation,
         props: true
     },
+    {
+        path: '/reservations',
+        name: 'Reservations',
+        component: ReservationList,
+        props: true
+    },
 ];
 
-// Create the router instance
 const router = createRouter({
-    history: createWebHistory(), // Use history mode
+    history: createWebHistory(),
     routes,
 });
 

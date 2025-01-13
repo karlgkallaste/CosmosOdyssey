@@ -1,8 +1,12 @@
 ﻿using CosmosOdyssey.App.Features.Legs.Models;
+using CosmosOdyssey.Domain.Features.Legs;
 using CosmosOdyssey.Domain.Features.PriceLists;
 using CosmosOdyssey.Domain.Features.PriceLists.Specifications;
+using CosmosOdyssey.Domain.Specifications;
 using FluentResults;
 using FluentValidation;
+using FluentValidation.AspNetCore;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
@@ -36,9 +40,6 @@ public class LegController : ControllerBase
         }
 
         var lastPriceList = validPriceLists.OrderBy(x => x.ValidUntil).First();
-        var companies = lastPriceList.Legs
-            .SelectMany(x => x.Providers.Select(x => new CompanyModel(x.Company.Id, x.Company.Name)))
-            .DistinctBy(x => x.Name).ToArray();
 
         var locations = lastPriceList.Legs.SelectMany(x => new[]
             {
@@ -49,7 +50,6 @@ public class LegController : ControllerBase
 
         return Ok(new LegListFilterOptionsModel()
         {
-            Companies = companies,
             Locations = locations
         });
     }
@@ -76,26 +76,85 @@ public class LegController : ControllerBase
     /// </returns>
     [HttpGet("list")]
     [ProducesResponseType(typeof(RouteListItemModel[]), 200)]
-    [ProducesResponseType(typeof(BadRequest), 400)]
+    [ProducesResponseType(typeof(ValidationResult), 400)]
     public async Task<IActionResult> Legs([FromServices] ILegListItemModelProvider legListProvider,
         [FromServices] IValidator<ListFiltersModel> validator,
         [FromServices] IRepository<PriceList> priceListRepository,
         [FromQuery] ListFiltersModel filters)
     {
-        var validPriceLists = await priceListRepository.FindAsync(new ValidUntilNotPassed(DateTime.Now.AddDays(-1)));
-        if (validPriceLists is null)
-        {
-            return BadRequest(Result.Fail("No fares available"));
-        }
-
-        var lastPriceList = validPriceLists.OrderBy(x => x.ValidUntil).First();
-
+        
         var validationResult = await validator.ValidateAsync(filters);
         if (!validationResult.IsValid)
         {
             return BadRequest(validationResult.Errors);
         }
+        
+        var validPriceLists = await priceListRepository.FindAsync(new ValidUntilNotPassed(DateTime.Now.AddDays(-1)));
+        if (validPriceLists is null)
+        {
+            return BadRequest(new ValidationResult());
+        }
+
+        var lastPriceList = validPriceLists.OrderBy(x => x.ValidUntil).First();
 
         return Ok(legListProvider.Provide(lastPriceList, filters));
+    }
+
+    [HttpGet("filter-providers")]
+    [ProducesResponseType(typeof(ProviderInfoModel[]), 200)]
+    [ProducesResponseType(typeof(BadRequest), 400)]
+    public async Task<IActionResult> LegProvidersList([FromServices] IRepository<PriceList> priceListRepository,
+        [FromQuery] ProviderListFiltersModel filters)
+    {
+        var priceList = await priceListRepository.FindAsync(new WithAnyGivenId<PriceList>(filters.PriceListId));
+        if (priceList is null)
+        {
+            return BadRequest();
+        }
+
+        var leg = priceList
+            .SelectMany(x => x.Legs)
+            .FirstOrDefault(x => x.Id == filters.LegId);
+
+        if (leg is null)
+        {
+            return BadRequest();
+        }
+
+        var specification = filters.ToSpecification();
+        var filteredProviders = leg.Providers.Where(specification.IsSatisfiedBy).AsQueryable();
+
+        var sortingFunc = filters.ToSorting();
+        if (sortingFunc != null)
+        {
+            filteredProviders = sortingFunc(filteredProviders);
+        }
+
+        return Ok(filteredProviders.Select(x => new ProviderInfoModel()
+        {
+            Id = x.Id,
+            Company = new CompanyInfoModel
+            {
+                Id = x.Company.Id,
+                Name = x.Company.Name
+            },
+            Price = x.Price,
+            FlightStart = x.FlightStart,
+            FlightEnd = x.FlightEnd
+        }));
+    }
+
+    public class SearchFiltersModel
+    {
+    }
+}
+
+public class ErrorResponse
+{
+    public List<string> Errors { get; set; }
+    
+    public ErrorResponse(params string[] errors)
+    {
+        Errors = errors.ToList();
     }
 }

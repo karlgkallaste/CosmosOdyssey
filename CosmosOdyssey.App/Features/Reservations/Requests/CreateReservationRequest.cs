@@ -33,7 +33,7 @@ public record PersonNameModel(string FirstName, string LastName)
     }
 }
 
-public record ReservationRouteModel(Guid CompanyId, Guid LegId)
+public record ReservationRouteModel(Guid CompanyId, Guid LegId, double Price, DateTimeOffset Departure, DateTimeOffset Arrival)
 {
     public ReserveRoute ToDomainObject()
     {

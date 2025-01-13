@@ -60,7 +60,7 @@ public class ReservationControllerTests
         var request = Builder<CreateReservationRequest>.CreateNew()
             .With(x => x.Routes, new[]
             {
-                new ReservationRouteModel(Guid.NewGuid(), Guid.NewGuid())
+               Builder<ReservationRouteModel>.CreateNew().Build()
             })
             .With(x => x.Name, new PersonNameModel("Test", "Tester")).Build();
 
@@ -83,7 +83,7 @@ public class ReservationControllerTests
         var request = Builder<CreateReservationRequest>.CreateNew()
             .With(x => x.Routes, new[]
             {
-                new ReservationRouteModel(Guid.NewGuid(), Guid.NewGuid())
+                Builder<ReservationRouteModel>.CreateNew().Build()
             })
             .With(x => x.Name, new PersonNameModel("Test", "Tester")).Build();
 

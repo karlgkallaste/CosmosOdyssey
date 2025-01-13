@@ -1,5 +1,6 @@
 ﻿using CosmosOdyssey.Domain.Features.PriceLists.Commands;
 using CosmosOdyssey.Services.PriceListServices;
+using CosmosOdyssey.Services.Services;
 using Hangfire;
 using Hangfire.PostgreSql;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,7 +19,6 @@ public static class ServicesServiceCollection
         services.AddHangfireServer();
         services.AddHttpClient();
         services.AddScoped<IPriceListService, PriceListService>();
-
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreatePriceListCommand).Assembly));
 
         return services;

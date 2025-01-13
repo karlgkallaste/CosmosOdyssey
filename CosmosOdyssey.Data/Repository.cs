@@ -38,8 +38,11 @@ public class Repository<T> : IRepository<T> where T : class, IEntity
 
     public async Task<T?> GetByIdAsync(Guid id)
     {
-        var entity = await _context.Set<T>()
-            .FirstOrDefaultAsync(pl => pl.Id == id);
+        IQueryable<T> query = _context.Set<T>();
+        query = ApplyEagerLoading(query);
+
+        // Retrieve the entity by ID
+        var entity = await query.FirstOrDefaultAsync(pl => pl.Id == id);
 
         return entity;
     }

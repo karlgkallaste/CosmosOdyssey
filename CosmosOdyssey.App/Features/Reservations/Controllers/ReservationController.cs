@@ -1,8 +1,10 @@
 ﻿using System.Collections.Immutable;
+using CosmosOdyssey.App.Features.Reservations.Models;
 using CosmosOdyssey.App.Features.Reservations.Requests;
 using CosmosOdyssey.Domain.Features.PriceLists;
 using CosmosOdyssey.Domain.Features.Reservations;
 using CosmosOdyssey.Domain.Features.Reservations.Commands;
+using CosmosOdyssey.Domain.Features.Reservations.Specifications;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -36,12 +38,32 @@ public class ReservationController : ControllerBase
 
         return Ok(commandResult.Value);
     }
+
+
     [HttpPost("list")]
-    [ProducesResponseType(typeof(Guid), 200)]
+    [ProducesResponseType(typeof(ReservationListItemModel[]), 200)]
     [ProducesResponseType(typeof(BadRequest), 400)]
-    public async Task<IActionResult> List([FromServices] IRepository<Reservation> reservationRepository)
+    public async Task<IActionResult> List([FromQuery] string lastName,
+        [FromServices] IRepository<Reservation> reservationRepository)
     {
-        
-        throw new NotImplementedException();
+        var reservations = await reservationRepository.FindAsync(new WithCustomerName(lastName));
+
+        return Ok(reservations.Select(x => new ReservationListItemModel(x)));
+    }
+
+    [HttpPost("{id}")]
+    [ProducesResponseType(typeof(ReservationDetailsModel), 200)]
+    [ProducesResponseType(typeof(BadRequest), 400)]
+    public async Task<IActionResult> Get(Guid id, [FromServices] IRepository<Reservation> reservationRepository,
+        [FromServices] IReservationProvider reservationProvider)
+    {
+        var reservation = await reservationRepository.GetByIdAsync(id);
+
+        if (reservation == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(reservationProvider.Provide(reservation));
     }
 }

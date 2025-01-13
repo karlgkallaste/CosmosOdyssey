@@ -51,7 +51,7 @@ public record Reservation : IEntity
         public Reservation Build()
         {
             var clone = (Reservation)_reservation.MemberwiseClone();
-            return _reservation;
+            return clone;
         }
     }
 }
@@ -66,7 +66,10 @@ public class ReservationRoute
     public long TotalTimeInMinutes { get; set; }
     public double Price { get; set; }
     public string Company { get; set; }
+    public DateTime Arrival { get; set; }
+    public DateTime Depart { get; set; }
     
     // Navigation property
     public Reservation Reservation { get; set; }
+    
 }

@@ -46,7 +46,7 @@ public class LegControllerTests
     }
 
     [Test]
-    public async Task ListFilters_returns_routes_and_companies_based_on_the_latest_priceList()
+    public async Task ListFilters_returns_routes_based_on_the_latest_priceList()
     {
         var companies = Builder<Company>.CreateListOfSize(4).Build();
         var locations = Builder<RouteLocation>.CreateListOfSize(4).Build();
@@ -92,7 +92,6 @@ public class LegControllerTests
         // Assert
         result.Should().BeOfType<OkObjectResult>();
         var value = (result as OkObjectResult)?.Value as LegListFilterOptionsModel;
-        value.Companies.Should().BeEquivalentTo(companies.Select(x => new CompanyModel(x.Id, x.Name)));
         value.Locations.Should().BeEquivalentTo(locations.Select(x => new LocationModel(x.Id, x.Name)));
     }
 

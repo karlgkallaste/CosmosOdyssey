@@ -7,9 +7,10 @@ using CosmosOdyssey.Services.PriceListServices.Models;
 using FluentResults;
 using Hangfire;
 using MediatR;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace CosmosOdyssey.Services.PriceListServices;
+namespace CosmosOdyssey.Services.Services;
 
 public interface IPriceListService
 {
@@ -23,33 +24,47 @@ public class PriceListService : IPriceListService
     private readonly PriceList.IBuilder _priceListBuilder;
     private readonly Leg.IBuilder _priceListLegBuilder;
     private readonly IRepository<PriceList> _priceListRepository;
-    private readonly string _travelPricesUrl;
+    private readonly ILogger<PriceListService> _logger;
+    private readonly IOptions<ApiSettings> _apiSettings;
 
-    public PriceListService(HttpClient httpClient, IOptions<ApiSettings> travelPricesUrl, IMediator mediator,
-        PriceList.IBuilder priceListBuilder, Leg.IBuilder priceListLegBuilder, IRepository<PriceList> priceListRepository)
+    public PriceListService(HttpClient httpClient, IOptions<ApiSettings> apiSettings, IMediator mediator,
+        PriceList.IBuilder priceListBuilder, Leg.IBuilder priceListLegBuilder, IRepository<PriceList> priceListRepository, ILogger<PriceListService> logger)
     {
         _httpClient = httpClient;
         _mediator = mediator;
         _priceListBuilder = priceListBuilder;
         _priceListLegBuilder = priceListLegBuilder;
         _priceListRepository = priceListRepository;
-        _travelPricesUrl = travelPricesUrl.Value.PriceListUrl;
+        _logger = logger;
+        _apiSettings = apiSettings;
     }
 
     public async Task<Result> GetLatestPriceList()
     {
-        var response = await _httpClient.GetAsync("https://cosmosodyssey.azurewebsites.net/api/v1.0/TravelPrices");
-
-        if (response.StatusCode == HttpStatusCode.BadRequest) return Result.Fail("Bad Request(400)");
-
-        if (response.StatusCode == HttpStatusCode.InternalServerError) return Result.Fail("Internal Server Error(500)");
-
+        var response = await _httpClient.GetAsync(_apiSettings.Value.PriceListUrl);
         var responseContent = await response.Content.ReadAsStringAsync();
+
+        if (response.StatusCode == HttpStatusCode.BadRequest)
+        {
+            _logger.LogError("[{Name}] Response status code: {StatusCode}. Content: {Content}", nameof(GetLatestPriceList), response.StatusCode, responseContent);
+            return Result.Fail("Query failed");
+        }
+
+        if (response.StatusCode == HttpStatusCode.InternalServerError)
+        {
+            _logger.LogError("[{Name}] Response status code: {StatusCode}. Content: {Content}", nameof(GetLatestPriceList), response.StatusCode, responseContent);
+            return Result.Fail("Server error");
+        }
+
 
         var modelFromResponse = JsonSerializer.Deserialize<PriceListResponseModel>(responseContent,
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-        if (modelFromResponse == null) return Result.Fail("Failed to parse price list response");
+        if (modelFromResponse == null)
+        {
+            _logger.LogError("[{Name}] Failed to deserialize. Content: {Content}", nameof(GetLatestPriceList), responseContent);
+            return Result.Fail("Failed to deserialize");
+        }
 
         var priceListLegs = modelFromResponse.Legs.Select(x => _priceListLegBuilder
                 .WithId(x.Id)
@@ -69,14 +84,14 @@ public class PriceListService : IPriceListService
 
         if (existingPriceList != null )
         {
+            _logger.LogError("[{Name}] Tried to create duplicate price list {Id}", nameof(GetLatestPriceList), modelFromResponse.Id);
             return Result.Fail("Price List already exists");
         }
         
         var result = await _mediator.Send(new CreatePriceListCommand(priceList));
-
         if (result.IsFailed) throw new Exception("Failed to create price list");
 
-        
+        // TODO FIGURE OUT
         
         BackgroundJob.Schedule(() => GetLatestPriceList(), new DateTimeOffset(modelFromResponse.ValidUntil, DateTimeOffset.Now.Offset));
         return Result.Ok();

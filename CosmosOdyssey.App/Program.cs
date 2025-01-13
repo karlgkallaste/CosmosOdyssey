@@ -1,8 +1,10 @@
 using CosmosOdyssey.App.Features.Legs.Models;
+using CosmosOdyssey.App.Features.Reservations.Models;
 using CosmosOdyssey.Data;
 using CosmosOdyssey.Domain;
 using CosmosOdyssey.Services;
 using CosmosOdyssey.Services.PriceListServices;
+using CosmosOdyssey.Services.Services;
 using FluentValidation;
 using Hangfire;
 using Microsoft.EntityFrameworkCore;
@@ -18,9 +20,11 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddMediatR(x => x.RegisterServicesFromAssembly(typeof(Program).Assembly));
+builder.Services.Configure<ApiSettings>(builder.Configuration.GetSection("ApiSettings"));
 
 builder.Services.AddTransient<ILegListItemModelProvider, LegListItemModelProvider>();
-builder.Services.AddValidatorsFromAssemblyContaining<ListFiltersModel.Validator>(); 
+builder.Services.AddTransient<IReservationProvider, ReservationProvider>();
+builder.Services.AddValidatorsFromAssemblyContaining<ListFiltersModel.Validator>();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowVite", policy =>
@@ -51,7 +55,7 @@ app.UseHttpsRedirection();
 using (var scope = app.Services.CreateScope())
 {
     var priceListService = scope.ServiceProvider.GetRequiredService<IPriceListService>();
-    
+
     BackgroundJob.Enqueue(() => priceListService.GetLatestPriceList());
 }
 

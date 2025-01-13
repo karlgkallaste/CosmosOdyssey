@@ -16,8 +16,12 @@ import AccordionContent from "primevue/accordioncontent";
 import Dialog  from "primevue/dialog";
 import InputText  from "primevue/inputtext";
 import Message  from "primevue/message";
+import Timeline  from "primevue/timeline";
+import Divider  from "primevue/divider";
+import DatePicker  from "primevue/datepicker";
+import Toast  from "primevue/toast";
 import router from "../router/router.ts";
-
+import ToastService from 'primevue/toastservice';
 import './tailwind.css';
 import 'primeicons/primeicons.css';
 
@@ -34,6 +38,7 @@ createApp(App)
             }
         }
     })
+    .use(ToastService)
     .component('DataTable', DataTable)
     .component('Column', Column)
     .component('Tag', Tag)
@@ -47,4 +52,8 @@ createApp(App)
     .component('Dialog', Dialog)
     .component('InputText', InputText)
     .component('Message', Message)
+    .component('Timeline', Timeline)
+    .component('Divider', Divider)
+    .component('Calendar', DatePicker)
+    .component('Toast', Toast)
     .mount('#app')

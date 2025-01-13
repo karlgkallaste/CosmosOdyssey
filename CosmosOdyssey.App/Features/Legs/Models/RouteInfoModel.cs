@@ -6,4 +6,5 @@ public class RouteInfoModel
     public LegInfoModel From { get; set; }
     public LegInfoModel To { get; set; }
     public ProviderInfoModel[] Providers { get; set; }
+    public double AveragePrice { get; set; }
 }

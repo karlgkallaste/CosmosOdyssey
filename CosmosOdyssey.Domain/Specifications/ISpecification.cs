@@ -4,8 +4,6 @@ namespace CosmosOdyssey.Domain.Specifications;
 
 public abstract class Specification<T> : ISpecification<T>
 {
-    // Static None specification (matches everything)
-    public static Specification<T> None => new NoneSpecification<T>();
     public abstract Expression<Func<T, bool>> ToExpression();
 
     public bool IsSatisfiedBy(T entity)
@@ -13,20 +11,21 @@ public abstract class Specification<T> : ISpecification<T>
         return ToExpression().Compile().Invoke(entity);
     }
 
-    // Overloading the += operator to combine specifications with logical AND
+    // Logical AND operator to combine specifications
     public static Specification<T> operator +(Specification<T> left, Specification<T> right)
     {
         return left.And(right);
     }
 
-    // Logical AND
     public Specification<T> And(Specification<T> other)
     {
         return new AndSpecification<T>(this, other);
     }
-}
 
-public class NoneSpecification<T> : Specification<T>
+    // Static None specification (matches everything)
+    public static Specification<T> None => new AnySpecification<T>();
+}
+public class AnySpecification<T> : Specification<T>
 {
     public override Expression<Func<T, bool>> ToExpression()
     {
@@ -63,5 +62,4 @@ public class AndSpecification<T> : Specification<T>
 public interface ISpecification<T>
 {
     Expression<Func<T, bool>> ToExpression();
-    bool IsSatisfiedBy(T entity);
 }
