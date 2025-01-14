@@ -47,6 +47,31 @@ public class CreateReservationCommandTests
     }
 
     [Test]
+    public async Task Returns_failed_result_if_priceList_is_expired()
+    {
+        var command = Builder<CreateReservationCommand>.CreateNew().With(x => x.Routes, new[]
+        {
+            new ReserveRoute(Guid.NewGuid(), Guid.NewGuid())
+        }.ToImmutableList()).Build();
+
+        var priceList = Builder<PriceList>
+            .CreateNew()
+            .With(x => x.ValidUntil, DateTime.Now.AddDays(-2))
+            .Build();
+
+        _priceListRepositoryMock.Setup(x => x.GetByIdAsync(command.PriceListId))
+            .ReturnsAsync(priceList);
+
+        // Act
+        var result = await _sut.Handle(command, default);
+
+        // Assert
+        result.IsFailed.Should().BeTrue();
+        result.Errors.Should().ContainSingle(e => e.Message.Contains("Prices are out of date"));
+        _reservationRepositoryMock.Verify(x => x.AddAsync(It.IsAny<Reservation>()), Times.Never);
+    }
+
+    [Test]
     public async Task Returns_failed_result_if_route_is_not_found_in_priceList()
     {
         var command = Builder<CreateReservationCommand>.CreateNew().With(x => x.Routes, new[]
@@ -56,6 +81,7 @@ public class CreateReservationCommandTests
 
         var priceList = Builder<PriceList>
             .CreateNew()
+            .With(x => x.ValidUntil, DateTime.Now.AddDays(2))
             .With(pl => pl.Legs, new[]
             {
                 Builder<Leg>.CreateNew().Build()
@@ -84,6 +110,7 @@ public class CreateReservationCommandTests
 
         var priceList = Builder<PriceList>
             .CreateNew()
+            .With(x => x.ValidUntil, DateTime.Now.AddDays(2))
             .With(pl => pl.Legs, new[]
             {
                 Builder<Leg>.CreateNew().With(x => x.Id, command.Routes[0].LegId).Build()
@@ -108,16 +135,18 @@ public class CreateReservationCommandTests
         var companyId = Guid.NewGuid();
         var legId = Guid.NewGuid();
 
-        var priceList = Builder<PriceList>.CreateNew().With(x => x.Legs, new[]
-        {
-            Builder<Leg>.CreateNew().With(x => x.Route,
-                    new Route(Guid.NewGuid(), new RouteLocation(Guid.NewGuid(), "as"),
-                        new RouteLocation(Guid.NewGuid(), "2"), 23))
-                .With(x => x.Id, legId)
-                .With(x => x.Providers,
-                    new[] { new Provider(Guid.NewGuid(), new Company(companyId, "asd"), 2, DateTime.Now, DateTime.Now) }
-                        .ToList()).Build(),
-        }.ToList()).Build();
+        var priceList = Builder<PriceList>.CreateNew()
+            .With(x => x.ValidUntil, DateTime.Now.AddDays(2))
+            .With(x => x.Legs, new[]
+            {
+                Builder<Leg>.CreateNew().With(x => x.Route,
+                        new Route(Guid.NewGuid(), new RouteLocation(Guid.NewGuid(), "as"),
+                            new RouteLocation(Guid.NewGuid(), "2"), 23))
+                    .With(x => x.Id, legId)
+                    .With(x => x.Providers,
+                        new[] { new Provider(Guid.NewGuid(), new Company(companyId, "asd"), 2, DateTime.Now, DateTime.Now) }
+                            .ToList()).Build(),
+            }.ToList()).Build();
 
         var command = new CreateReservationCommand(priceList.Id, new Customer(Guid.Empty, "First", "Last"), new[]
         {
@@ -153,16 +182,18 @@ public class CreateReservationCommandTests
         var companyId = Guid.NewGuid();
         var legId = Guid.NewGuid();
 
-        var priceList = Builder<PriceList>.CreateNew().With(x => x.Legs, new[]
-        {
-            Builder<Leg>.CreateNew().With(x => x.Route,
-                    new Route(Guid.NewGuid(), new RouteLocation(Guid.NewGuid(), "as"),
-                        new RouteLocation(Guid.NewGuid(), "2"), 23))
-                .With(x => x.Id, legId)
-                .With(x => x.Providers,
-                    new[] { new Provider(Guid.NewGuid(), new Company(companyId, "asd"), 2, DateTime.Now, DateTime.Now) }
-                        .ToList()).Build(),
-        }.ToList()).Build();
+        var priceList = Builder<PriceList>.CreateNew()
+            .With(x => x.ValidUntil, DateTime.Now.AddDays(2))
+            .With(x => x.Legs, new[]
+            {
+                Builder<Leg>.CreateNew().With(x => x.Route,
+                        new Route(Guid.NewGuid(), new RouteLocation(Guid.NewGuid(), "as"),
+                            new RouteLocation(Guid.NewGuid(), "2"), 23))
+                    .With(x => x.Id, legId)
+                    .With(x => x.Providers,
+                        new[] { new Provider(Guid.NewGuid(), new Company(companyId, "asd"), 2, DateTime.Now, DateTime.Now) }
+                            .ToList()).Build(),
+            }.ToList()).Build();
 
         var command = new CreateReservationCommand(priceList.Id, new Customer(Guid.Empty, "First", "Last"), new[]
         {
