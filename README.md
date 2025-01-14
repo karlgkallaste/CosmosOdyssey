@@ -1,6 +1,6 @@
 # Cosmos Odyssey
 
-**Solar System Travel Deals**:
+**Solar System Travel Deals**
 
 ---
 
@@ -48,15 +48,18 @@ Make sure you have the following installed:
 
    ```
    git clone https://github.com/karlgkallaste/CosmosOdyssey.git
+   ```
+2. **Navigate to folder**:
+
+   ```
    cd CosmosOdyssey
    ```
-   docker-compose -f docker-compose-build.yml build
-   docker-compose -f docker-compose-build.yml up
-2. Build the Docker images
+
+3. Build the Docker images
    ```
    docker-compose -f docker-compose-build.yml build
    ```
-3. Start the Docker containers:
+4. Start the Docker containers:
    ```
    docker-compose -f docker-compose-build.yml up
    ```
