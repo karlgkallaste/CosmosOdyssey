@@ -64,16 +64,12 @@ export default defineComponent({
       if (this.request.routes == undefined) {
         this.request.routes = [];
       }
-
-      // Check if a route with the given legId exists
+      
       const routeProvider = this.request.routes.find(x => x.legId === legId);
-
       if (routeProvider !== undefined) {
-        // If it exists, remove it
         this.request.routes = this.request.routes.filter(x => x.legId !== legId);
       }
 
-      // Add the new route
       this.request.routes.push(new api.ReservationRouteModel({
         legId: legId,
         companyId: provider.company?.id,
@@ -84,9 +80,9 @@ export default defineComponent({
     },
     formatDate(date: Date | undefined) {
       return date ? date.toLocaleString('en-US', {
-            weekday: 'short', // Abbreviated day of the week (e.g., "Mon")
+            weekday: 'short', 
             year: 'numeric',
-            month: 'short', // Abbreviated month (e.g., "Jan")
+            month: 'short',
             day: 'numeric',
             hour: '2-digit',
             minute: '2-digit',
@@ -97,7 +93,7 @@ export default defineComponent({
   computed: {
     totalPrice() {
       return this.request.routes!.reduce((total, route) => {
-        return total + (route.price || 0); // Adding price, defaulting to 0 if route.price is undefined or null
+        return total + (route.price || 0); 
       }, 0)
     }
   }

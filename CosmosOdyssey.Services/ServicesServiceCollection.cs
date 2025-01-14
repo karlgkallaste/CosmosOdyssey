@@ -1,10 +1,6 @@
 ﻿using CosmosOdyssey.Domain.Features.PriceLists.Commands;
-using CosmosOdyssey.Services.PriceListServices;
 using CosmosOdyssey.Services.Services;
-using Hangfire;
-using Hangfire.PostgreSql;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 
 namespace CosmosOdyssey.Services;
 

@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using CosmosOdyssey.Domain;
 using CosmosOdyssey.Domain.Features.Legs;
 using CosmosOdyssey.Domain.Features.PriceLists;
 using FluentAssertions;

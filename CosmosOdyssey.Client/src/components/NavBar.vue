@@ -13,7 +13,7 @@
 <script>
 import {defineComponent} from 'vue';
 import Menubar from 'primevue/menubar';
-import {RouterLink} from "vue-router"; // Import Menubar from PrimeVue
+import {RouterLink} from "vue-router"; 
 
 export default defineComponent({
   name: 'Navbar',
@@ -32,13 +32,6 @@ export default defineComponent({
           }
         },
         {
-          label: 'About',
-          icon: 'pi pi-star',
-          command: () => {
-            this.$router.push('/about');
-          }
-        },
-        {
           label: 'Reservations',
           icon: 'pi pi-list',
           command: () => {
@@ -52,5 +45,4 @@ export default defineComponent({
 </script>
 
 <style scoped>
-/* Optionally, you can add custom styles for your navbar */
 </style>

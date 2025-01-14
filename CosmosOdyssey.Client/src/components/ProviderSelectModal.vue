@@ -1,7 +1,6 @@
 <script lang="ts">
 import {defineComponent} from 'vue'
 import {api} from "../../apiClients.generated";
-import {debounce} from 'vue-debounce';
 
 export default defineComponent({
   name: "ProviderSelectModal",
@@ -11,7 +10,7 @@ export default defineComponent({
       providers: [] as api.ProviderInfoModel[],
       filters: new SearchFiltersModel(),
       legId: "",
-      priceListId: ""
+      priceListId: "",
     }
   },
 
@@ -19,9 +18,12 @@ export default defineComponent({
     this.$watch(
         'filters',
         (newValue) => {
-          this.filters = newValue;
-          this.fetchProviders(this.filters)
-        }, {deep: true}
+          setTimeout(() => {
+            this.filters = newValue;
+            this.fetchProviders(this.filters);
+          }, 500);
+        },
+        { deep: true }
     );
   },
   methods: {
@@ -44,9 +46,9 @@ export default defineComponent({
     },
     formatDate(date: Date | undefined) {
       return date ? date.toLocaleString('en-US', {
-            weekday: 'short', // Abbreviated day of the week (e.g., "Mon")
+            weekday: 'short', 
             year: 'numeric',
-            month: 'short', // Abbreviated month (e.g., "Jan")
+            month: 'short', 
             day: 'numeric',
             hour: '2-digit',
             minute: '2-digit',

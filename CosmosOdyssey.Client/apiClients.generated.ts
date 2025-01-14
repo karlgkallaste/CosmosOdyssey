@@ -55,7 +55,7 @@ export class ReservationClient extends ClientBase {
     }
 
     create(request: CreateReservationRequest): Promise<string> {
-        let url_ = this.baseUrl + "/reservations";
+        let url_ = this.baseUrl + "/Reservation";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(request);
@@ -104,7 +104,7 @@ export class ReservationClient extends ClientBase {
     }
 
     list(lastName: string | undefined): Promise<ReservationListItemModel[]> {
-        let url_ = this.baseUrl + "/reservations?";
+        let url_ = this.baseUrl + "/Reservation?";
         if (lastName === null)
             throw new Error("The parameter 'lastName' cannot be null.");
         else if (lastName !== undefined)
@@ -159,7 +159,7 @@ export class ReservationClient extends ClientBase {
     }
 
     get(id: string): Promise<ReservationDetailsModel> {
-        let url_ = this.baseUrl + "/reservations/{id}";
+        let url_ = this.baseUrl + "/Reservation/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -225,7 +225,7 @@ export class LegClient extends ClientBase {
     }
 
     listFilters(): Promise<LegListFilterOptionsModel> {
-        let url_ = this.baseUrl + "/Leg/legs/list-filters";
+        let url_ = this.baseUrl + "/Leg/list-filters";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: RequestInit = {
@@ -269,7 +269,7 @@ export class LegClient extends ClientBase {
     }
 
     list(from: string | undefined, to: string | undefined, departureDate: Date | undefined): Promise<RouteListItemModel[]> {
-        let url_ = this.baseUrl + "/Leg/legs?";
+        let url_ = this.baseUrl + "/Leg?";
         if (from === null)
             throw new Error("The parameter 'from' cannot be null.");
         else if (from !== undefined)
@@ -332,7 +332,7 @@ export class LegClient extends ClientBase {
     }
 
     providers(legId: string | undefined, priceListId: string | undefined, priceLimit: number | null | undefined, arriveBy: Date | null | undefined, companyName: string | null | undefined, sortBy: string | null | undefined): Promise<ProviderInfoModel[]> {
-        let url_ = this.baseUrl + "/Leg/legs/providers?";
+        let url_ = this.baseUrl + "/Leg/providers?";
         if (legId === null)
             throw new Error("The parameter 'legId' cannot be null.");
         else if (legId !== undefined)

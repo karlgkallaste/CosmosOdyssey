@@ -1,9 +1,11 @@
-﻿using CosmosOdyssey.Domain.Features.PriceLists;
+﻿using CosmosOdyssey.Domain;
+using CosmosOdyssey.Domain.Features.PriceLists;
+using CosmosOdyssey.Domain.Specifications;
 using FizzWare.NBuilder;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 
-namespace CosmosOdyssey.Data.Tests.Features.PriceLists;
+namespace CosmosOdyssey.Data.Tests;
 
 [TestFixture]
 public class RepositoryTests
@@ -69,4 +71,39 @@ public class RepositoryTests
         // Assert
         result.Should().BeEquivalentTo(priceList);
     }
+
+    [Test]
+    public async Task FindAsync_Filters_Data_Based_On_Specification()
+    {
+        var priceList1 = Builder<PriceList>.CreateNew().With(x => x.Id, Guid.NewGuid()).Build();
+        var priceList2 = Builder<PriceList>.CreateNew().With(x => x.Id, Guid.NewGuid()).Build();
+        await _context.PriceLists.AddRangeAsync(priceList1, priceList2);
+        await _context.SaveChangesAsync();
+        
+        // Act
+        var result = await _sut.FindAsync(new WithAnyGivenId<PriceList>(priceList1.Id));
+        
+        // Assert
+        result.Should().BeEquivalentTo([priceList1]);
+    }
+
+    [Test]
+    public async Task DeleteRangeAsync_Deletes_Entities()
+    {
+        var priceList1 = Builder<PriceList>.CreateNew().With(x => x.Id, Guid.NewGuid()).Build();
+        var priceList2 = Builder<PriceList>.CreateNew().With(x => x.Id, Guid.NewGuid()).Build();
+        var priceList3 = Builder<PriceList>.CreateNew().With(x => x.Id, Guid.NewGuid()).Build();
+        await _context.PriceLists.AddRangeAsync(priceList1, priceList2, priceList3);
+        await _context.SaveChangesAsync();
+        
+        // Act
+        var result = await _sut.DeleteRangeAsync([priceList1, priceList2]);
+        var query = _context.PriceLists.AsQueryable().ToArray();
+        
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        query.Should().NotContain([priceList1, priceList2]);
+        query.Should().Contain([priceList3]);
+    }
 }
+

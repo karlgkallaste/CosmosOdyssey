@@ -39,8 +39,9 @@ public class CreateReservationCommand : IRequest<Result<Guid>>
             var existingPriceList = await _priceListRepository.GetByIdAsync(command.PriceListId);
             if (existingPriceList == null) return Result.Fail("Price list not found");
 
+            if (existingPriceList.ValidUntil < DateTime.Now) return Result.Fail("Prices are out of date");
+            
             var routes = new List<ReservationRoute>();
-
             foreach (var route in command.Routes)
             {
                 var routeLeg = existingPriceList.Legs.FirstOrDefault(x => x.Id == route.LegId);

@@ -32,14 +32,20 @@ export default defineComponent({
   mounted() {
     new api.LegClient().list(this.$props.from, this.$props.to, new Date(this.$props.departDate)).then(routes => {
       this.routes = routes;
-    }).catch((error) => { // Use custom error type if not using axios
-      // Handle the error as needed
-      this.$toast.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: "Test",
-        life: 3000,
-      });
+    }).catch(e => {
+      if (e.status == 400) {
+        const parsedResponse = JSON.parse(e.response);
+        parsedResponse.forEach((error: { errorMessage: string }) => {
+          this.$toast.add({
+            severity: 'error',
+            summary: 'Validation Error',
+            detail: error.errorMessage, // Display each error message in the toast
+            life: 3000, // Toast duration
+          });
+        });
+      } else {
+        throw e;
+      }
     });
   },
   methods: {

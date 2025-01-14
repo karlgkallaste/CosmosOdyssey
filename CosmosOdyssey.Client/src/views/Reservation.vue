@@ -26,7 +26,7 @@ export default defineComponent({
   computed:{
     totalPrice(){
       return this.reservation.routes ? this.reservation.routes.reduce((total, route) => {
-        return total + (Number.parseFloat(route.price!.toString()) || 0); // Adding price, defaulting to 0 if route.price is undefined or null
+        return total + (Number.parseFloat(route.price!.toString()) || 0);
       }, 0) : 0
     }
   }

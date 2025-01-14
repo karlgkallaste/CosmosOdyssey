@@ -4,7 +4,6 @@ using CosmosOdyssey.App.Features.Reservations.Models;
 using CosmosOdyssey.Data;
 using CosmosOdyssey.Domain;
 using CosmosOdyssey.Services;
-using CosmosOdyssey.Services.PriceListServices;
 using CosmosOdyssey.Services.Services;
 using FluentValidation;
 using Hangfire;
@@ -33,8 +32,8 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowVite", policy =>
     {
         policy.WithOrigins(
-                "http://localhost:5173", 
-                "http://127.0.0.1:5173", 
+                "http://localhost:5173",
+                "http://127.0.0.1:5173",
                 "http://frontend:5173"
             )
             .AllowAnyHeader()
@@ -60,8 +59,6 @@ builder.WebHost.ConfigureKestrel(options =>
 
 var app = builder.Build();
 app.UseCors("AllowVite");
-app.UseStaticFiles();
-app.UseRouting(); //
 if (app.Environment.IsDevelopment())
 {
     app.UseOpenApi();
