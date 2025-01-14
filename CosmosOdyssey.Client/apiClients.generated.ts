@@ -17,7 +17,8 @@ export class ClientBase {
     }
 
     getBaseUrl(defaultUrl: string, baseUrl?: string) {
-        return "https://localhost:7299";
+        const apiUrl = import.meta.env.VITE_API_BASE_URL;
+        return apiUrl;
     }
 
     protected transformOptions(options: any) {
@@ -54,7 +55,7 @@ export class ReservationClient extends ClientBase {
     }
 
     create(request: CreateReservationRequest): Promise<string> {
-        let url_ = this.baseUrl + "/Reservation/create";
+        let url_ = this.baseUrl + "/reservations";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(request);
@@ -103,7 +104,7 @@ export class ReservationClient extends ClientBase {
     }
 
     list(lastName: string | undefined): Promise<ReservationListItemModel[]> {
-        let url_ = this.baseUrl + "/Reservation/list?";
+        let url_ = this.baseUrl + "/reservations?";
         if (lastName === null)
             throw new Error("The parameter 'lastName' cannot be null.");
         else if (lastName !== undefined)
@@ -111,7 +112,7 @@ export class ReservationClient extends ClientBase {
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: RequestInit = {
-            method: "POST",
+            method: "GET",
             headers: {
                 "Accept": "application/json"
             }
@@ -158,14 +159,14 @@ export class ReservationClient extends ClientBase {
     }
 
     get(id: string): Promise<ReservationDetailsModel> {
-        let url_ = this.baseUrl + "/Reservation/{id}";
+        let url_ = this.baseUrl + "/reservations/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: RequestInit = {
-            method: "POST",
+            method: "GET",
             headers: {
                 "Accept": "application/json"
             }
@@ -196,6 +197,13 @@ export class ReservationClient extends ClientBase {
             result400 = BadRequest.fromJS(resultData400, _mappings);
             return throwException("A server side error occurred.", status, _responseText, _headers, result400);
             });
+        } else if (status === 404) {
+            return response.text().then((_responseText) => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : jsonParse(_responseText, this.jsonParseReviver);
+            result404 = NotFound.fromJS(resultData404, _mappings);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+            });
         } else if (status !== 200 && status !== 204) {
             return response.text().then((_responseText) => {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
@@ -217,7 +225,7 @@ export class LegClient extends ClientBase {
     }
 
     listFilters(): Promise<LegListFilterOptionsModel> {
-        let url_ = this.baseUrl + "/Leg/list-filters";
+        let url_ = this.baseUrl + "/Leg/legs/list-filters";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: RequestInit = {
@@ -249,7 +257,7 @@ export class LegClient extends ClientBase {
             return response.text().then((_responseText) => {
             let result400: any = null;
             let resultData400 = _responseText === "" ? null : jsonParse(_responseText, this.jsonParseReviver);
-            result400 = BadRequest.fromJS(resultData400, _mappings);
+            result400 = ValidationResult.fromJS(resultData400, _mappings);
             return throwException("A server side error occurred.", status, _responseText, _headers, result400);
             });
         } else if (status !== 200 && status !== 204) {
@@ -260,8 +268,8 @@ export class LegClient extends ClientBase {
         return Promise.resolve<LegListFilterOptionsModel>(null as any);
     }
 
-    legs(from: string | undefined, to: string | undefined, departureDate: Date | undefined): Promise<RouteListItemModel[]> {
-        let url_ = this.baseUrl + "/Leg/list?";
+    list(from: string | undefined, to: string | undefined, departureDate: Date | undefined): Promise<RouteListItemModel[]> {
+        let url_ = this.baseUrl + "/Leg/legs?";
         if (from === null)
             throw new Error("The parameter 'from' cannot be null.");
         else if (from !== undefined)
@@ -286,11 +294,11 @@ export class LegClient extends ClientBase {
         return this.transformOptions(options_).then(transformedOptions_ => {
             return this.http.fetch(url_, transformedOptions_);
         }).then((_response: Response) => {
-            return this.transformResult(url_, _response, (_response: Response) => this.processLegs(_response));
+            return this.transformResult(url_, _response, (_response: Response) => this.processList(_response));
         });
     }
 
-    protected processLegs(response: Response): Promise<RouteListItemModel[]> {
+    protected processList(response: Response): Promise<RouteListItemModel[]> {
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         let _mappings: { source: any, target: any }[] = [];
@@ -323,8 +331,8 @@ export class LegClient extends ClientBase {
         return Promise.resolve<RouteListItemModel[]>(null as any);
     }
 
-    legProvidersList(legId: string | undefined, priceListId: string | undefined, priceLimit: number | null | undefined, arriveBy: Date | null | undefined, companyName: string | null | undefined, sortBy: string | null | undefined): Promise<ProviderInfoModel[]> {
-        let url_ = this.baseUrl + "/Leg/filter-providers?";
+    providers(legId: string | undefined, priceListId: string | undefined, priceLimit: number | null | undefined, arriveBy: Date | null | undefined, companyName: string | null | undefined, sortBy: string | null | undefined): Promise<ProviderInfoModel[]> {
+        let url_ = this.baseUrl + "/Leg/legs/providers?";
         if (legId === null)
             throw new Error("The parameter 'legId' cannot be null.");
         else if (legId !== undefined)
@@ -353,11 +361,11 @@ export class LegClient extends ClientBase {
         return this.transformOptions(options_).then(transformedOptions_ => {
             return this.http.fetch(url_, transformedOptions_);
         }).then((_response: Response) => {
-            return this.transformResult(url_, _response, (_response: Response) => this.processLegProvidersList(_response));
+            return this.transformResult(url_, _response, (_response: Response) => this.processProviders(_response));
         });
     }
 
-    protected processLegProvidersList(response: Response): Promise<ProviderInfoModel[]> {
+    protected processProviders(response: Response): Promise<ProviderInfoModel[]> {
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         let _mappings: { source: any, target: any }[] = [];
@@ -412,7 +420,7 @@ export class ValidationResult implements IValidationResult {
             if (Array.isArray(_data["errors"])) {
                 this.errors = [] as any;
                 for (let item of _data["errors"])
-                    this.errors!.push(ValidationFailure.fromJS(item, _mappings));
+                    this.errors!.push(<ValidationFailure>ValidationFailure.fromJS(item, _mappings));
             }
             else {
                 this.errors = <any>null;
@@ -570,7 +578,7 @@ export class CreateReservationRequest implements ICreateReservationRequest {
             if (Array.isArray(_data["routes"])) {
                 this.routes = [] as any;
                 for (let item of _data["routes"])
-                    this.routes!.push(ReservationRouteModel.fromJS(item, _mappings));
+                    this.routes!.push(<ReservationRouteModel>ReservationRouteModel.fromJS(item, _mappings));
             }
             else {
                 this.routes = <any>null;
@@ -826,7 +834,7 @@ export class ReservationDetailsModel implements IReservationDetailsModel {
             if (Array.isArray(_data["routes"])) {
                 this.routes = [] as any;
                 for (let item of _data["routes"])
-                    this.routes!.push(ReservationRouteDetailsModel.fromJS(item, _mappings));
+                    this.routes!.push(<ReservationRouteDetailsModel>ReservationRouteDetailsModel.fromJS(item, _mappings));
             }
             else {
                 this.routes = <any>null;
@@ -918,6 +926,47 @@ export interface IReservationRouteDetailsModel {
     to?: string;
 }
 
+export class NotFound implements INotFound {
+    statusCode?: number;
+
+    constructor(data?: INotFound) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any, _mappings?: any) {
+        if (_data) {
+            this.statusCode = _data["statusCode"] !== undefined ? _data["statusCode"] : <any>null;
+        }
+    }
+
+    static fromJS(data: any, _mappings?: any): NotFound | null {
+        data = typeof data === 'object' ? data : {};
+        return createInstance<NotFound>(data, _mappings, NotFound);
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["statusCode"] = this.statusCode !== undefined ? this.statusCode : <any>null;
+        return data;
+    }
+
+    clone(): NotFound {
+        const json = this.toJSON();
+        let result = new NotFound();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface INotFound {
+    statusCode?: number;
+}
+
 export class LegListFilterOptionsModel implements ILegListFilterOptionsModel {
     locations?: LocationModel[];
 
@@ -935,7 +984,7 @@ export class LegListFilterOptionsModel implements ILegListFilterOptionsModel {
             if (Array.isArray(_data["locations"])) {
                 this.locations = [] as any;
                 for (let item of _data["locations"])
-                    this.locations!.push(LocationModel.fromJS(item, _mappings));
+                    this.locations!.push(<LocationModel>LocationModel.fromJS(item, _mappings));
             }
             else {
                 this.locations = <any>null;
@@ -1034,7 +1083,7 @@ export class RouteListItemModel implements IRouteListItemModel {
             if (Array.isArray(_data["routes"])) {
                 this.routes = [] as any;
                 for (let item of _data["routes"])
-                    this.routes!.push(RouteInfoModel.fromJS(item, _mappings));
+                    this.routes!.push(<RouteInfoModel>RouteInfoModel.fromJS(item, _mappings));
             }
             else {
                 this.routes = <any>null;
@@ -1095,7 +1144,7 @@ export class RouteInfoModel implements IRouteInfoModel {
             if (Array.isArray(_data["providers"])) {
                 this.providers = [] as any;
                 for (let item of _data["providers"])
-                    this.providers!.push(ProviderInfoModel.fromJS(item, _mappings));
+                    this.providers!.push(<ProviderInfoModel>ProviderInfoModel.fromJS(item, _mappings));
             }
             else {
                 this.providers = <any>null;
@@ -1382,4 +1431,5 @@ function throwException(message: string, status: number, response: string, heade
     throw new ApiException(message, status, response, headers, result);
 }
 
+/// <reference types="vite/client" />
 }

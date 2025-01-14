@@ -6,6 +6,7 @@ using CosmosOdyssey.Domain.Features.Legs;
 using CosmosOdyssey.Domain.Features.PriceLists;
 using CosmosOdyssey.Domain.Features.PriceLists.Specifications;
 using CosmosOdyssey.Domain.Features.Routes;
+using CosmosOdyssey.Domain.Specifications;
 using FizzWare.NBuilder;
 using FluentAssertions;
 using FluentValidation;
@@ -42,7 +43,7 @@ public class LegControllerTests
         var result = await _sut.ListFilters(_repositoryMock.Object);
 
         // Assert
-        result.Should().BeOfType<BadRequestResult>();
+        result.Should().BeOfType<BadRequestObjectResult>();
     }
 
     [Test]
@@ -96,7 +97,7 @@ public class LegControllerTests
     }
 
     [Test]
-    public async Task Legs_returns_badRequest_if_priceLists_are_not_found()
+    public async Task List_returns_badRequest_if_priceLists_are_not_found()
     {
         var filters = Builder<ListFiltersModel>.CreateNew().Build();
 
@@ -105,16 +106,17 @@ public class LegControllerTests
             .ReturnsAsync((List<PriceList>)null!);
 
         // Act
-        var result = await _sut.Legs(_legListItemModelProviderMock.Object, _listFiltersModelValidatorMock.Object,
+        var result = await _sut.List(_legListItemModelProviderMock.Object, _listFiltersModelValidatorMock.Object,
             _repositoryMock.Object, filters);
 
         // Assert
         result.Should().BeOfType<BadRequestObjectResult>();
-        _legListItemModelProviderMock.Verify(x => x.Provide(It.IsAny<PriceList>(),It.IsAny<ListFiltersModel>()), Times.Never);
+        _legListItemModelProviderMock.Verify(x => x.Provide(It.IsAny<PriceList>(), It.IsAny<ListFiltersModel>()),
+            Times.Never);
     }
 
     [Test]
-    public async Task Legs_returns_badRequest_if_validation_fails()
+    public async Task List_returns_badRequest_if_validation_fails()
     {
         var filters = Builder<ListFiltersModel>.CreateNew().Build();
 
@@ -133,16 +135,17 @@ public class LegControllerTests
         });
 
         // Act
-        var result = await _sut.Legs(_legListItemModelProviderMock.Object, _listFiltersModelValidatorMock.Object,
+        var result = await _sut.List(_legListItemModelProviderMock.Object, _listFiltersModelValidatorMock.Object,
             _repositoryMock.Object, filters);
 
         // Assert
         result.Should().BeOfType<BadRequestObjectResult>();
-        _legListItemModelProviderMock.Verify(x => x.Provide(It.IsAny<PriceList>(),It.IsAny<ListFiltersModel>()), Times.Never);
+        _legListItemModelProviderMock.Verify(x => x.Provide(It.IsAny<PriceList>(), It.IsAny<ListFiltersModel>()),
+            Times.Never);
     }
 
     [Test]
-    public async Task Legs_returns_ok_if_validation_succeeds()
+    public async Task List_returns_ok_if_validation_succeeds()
     {
         var filters = Builder<ListFiltersModel>.CreateNew().Build();
 
@@ -153,14 +156,77 @@ public class LegControllerTests
 
         _listFiltersModelValidatorMock.Setup(x => x.ValidateAsync(filters, default))
             .ReturnsAsync(new ValidationResult());
-        
+
         var routes = Builder<RouteListItemModel>.CreateListOfSize(2).Build();
         _legListItemModelProviderMock.Setup(x => x.Provide(priceList, filters))
             .Returns(routes.ToImmutableList());
 
         // Act
-        var result = await _sut.Legs(_legListItemModelProviderMock.Object, _listFiltersModelValidatorMock.Object,
+        var result = await _sut.List(_legListItemModelProviderMock.Object, _listFiltersModelValidatorMock.Object,
             _repositoryMock.Object, filters);
+
+        // Assert
+        result.Should().BeOfType<OkObjectResult>();
+    }
+
+    [Test]
+    public async Task LegProvidersList_returns_badRequest_if_priceList_is_not_found()
+    {
+        var filters = Builder<ProviderListFiltersModel>.CreateNew().Build();
+
+        _repositoryMock.Setup(x => x.FindAsync(new WithAnyGivenId<PriceList>(filters.PriceListId)))
+            .ReturnsAsync((List<PriceList>)null!);
+
+
+        // Act
+        var result = await _sut.Providers(_repositoryMock.Object, filters);
+
+        // Assert
+        result.Should().BeOfType<BadRequestObjectResult>();
+    }
+
+    [Test]
+    public async Task LegProvidersList_returns_badRequest_if_leg_is_not_found()
+    {
+        var filters = Builder<ProviderListFiltersModel>.CreateNew().Build();
+
+        var priceList = Builder<PriceList>.CreateNew().Build();
+        _repositoryMock.Setup(x => x.FindAsync(new WithAnyGivenId<PriceList>(filters.PriceListId)))
+            .ReturnsAsync(new List<PriceList> { priceList });
+
+        // Act
+        var result = await _sut.Providers(_repositoryMock.Object, filters);
+
+        // Assert
+        result.Should().BeOfType<BadRequestObjectResult>();
+    }
+
+    [Test]
+    public async Task LegProvidersList_returns_providers_based_on_filters()
+    {
+        var filters = Builder<ProviderListFiltersModel>.CreateNew()
+            .With(x => x.PriceListId, Guid.NewGuid())
+            .With(x => x.LegId, Guid.NewGuid())
+            .With(x => x.CompanyName, "Space")
+            .Build();
+
+        var priceList = Builder<PriceList>.CreateNew()
+            .With(x => x.Id, filters.PriceListId)
+            .With(x => x.ValidUntil, DateTime.Now).With(x => x.Legs, new[]
+            {
+                Builder<Leg>.CreateNew().With(x => x.Id, filters.LegId).With(x => x.Providers, new[]
+                {
+                    Builder<Provider>.CreateNew().With(x => x.Company, new Company(Guid.NewGuid(), "SpacE")).Build(),
+                    Builder<Provider>.CreateNew().With(x => x.Company, new Company(Guid.NewGuid(), "Cosmos")).Build(),
+                }.ToList()).Build()
+            }.ToList()).Build();
+
+
+        _repositoryMock.Setup(x => x.FindAsync(It.IsAny<WithAnyGivenId<PriceList>>()))
+            .ReturnsAsync(new List<PriceList> { priceList });
+
+        // Act
+        var result = await _sut.Providers(_repositoryMock.Object, filters);
 
         // Assert
         result.Should().BeOfType<OkObjectResult>();

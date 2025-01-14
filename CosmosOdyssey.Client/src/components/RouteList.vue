@@ -30,7 +30,7 @@ export default defineComponent({
     }
   },
   mounted() {
-    new api.LegClient().legs(this.$props.from, this.$props.to, new Date(this.$props.departDate)).then(routes => {
+    new api.LegClient().list(this.$props.from, this.$props.to, new Date(this.$props.departDate)).then(routes => {
       this.routes = routes;
     }).catch((error) => { // Use custom error type if not using axios
       // Handle the error as needed

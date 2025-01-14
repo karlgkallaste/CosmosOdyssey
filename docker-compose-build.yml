@@ -1,0 +1,58 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: cosmos
+      POSTGRES_PASSWORD: odyssey
+      POSTGRES_DB: cosmos_odyssey
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "cosmos", "-d", "cosmos_odyssey"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 5s
+    networks:
+      - cosmos_network
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: .
+      dockerfile: CosmosOdyssey.App/Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DefaultConnection=Host=db;Database=cosmos_odyssey;Username=cosmos;Password=odyssey
+      - ApiSettings__PriceListUrl=https://cosmosodyssey.azurewebsites.net/api/v1.0/TravelPrices
+    depends_on:
+      - db  # Removed the 'condition' as it's not supported in Docker Compose 3.x, but db will be started before backend
+    networks:
+      - cosmos_network
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./CosmosOdyssey.Client
+      dockerfile: Dockerfile
+    ports:
+      - "5173:80"
+    environment:
+      - VITE_API_BASE_URL=http://backend:5000  # Backend should be accessed via 'http://backend:5000'
+    depends_on:
+      - backend  # Ensure backend is up before frontend starts
+    networks:
+      - cosmos_network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  cosmos_network:
+    driver: bridge

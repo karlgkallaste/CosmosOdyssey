@@ -10,9 +10,6 @@ public static class DataServiceCollection
 {
     public static IServiceCollection RegisterDataServices(this IServiceCollection services)
     {
-        services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseNpgsql("Host=localhost;Database=cosmos_odyssey;Username=cosmos;Password=odyssey"));
-
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
         services.AddTransient<PriceList.IBuilder, PriceList.Builder>();
         services.AddTransient<Reservation.IBuilder, Reservation.Builder>();
