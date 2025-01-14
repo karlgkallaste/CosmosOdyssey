@@ -1,4 +1,5 @@
-﻿using CosmosOdyssey.Domain.Features.Legs;
+﻿using CosmosOdyssey.Domain;
+using CosmosOdyssey.Domain.Features.Legs;
 using CosmosOdyssey.Domain.Features.PriceLists;
 using CosmosOdyssey.Domain.Features.Reservations;
 using Microsoft.EntityFrameworkCore;

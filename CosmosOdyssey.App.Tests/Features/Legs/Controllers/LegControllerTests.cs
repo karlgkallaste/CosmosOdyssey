@@ -1,6 +1,7 @@
 ﻿using System.Collections.Immutable;
 using CosmosOdyssey.App.Features.Legs.Controllers;
 using CosmosOdyssey.App.Features.Legs.Models;
+using CosmosOdyssey.Domain;
 using CosmosOdyssey.Domain.Features.Companies;
 using CosmosOdyssey.Domain.Features.Legs;
 using CosmosOdyssey.Domain.Features.PriceLists;

@@ -1,7 +1,8 @@
-﻿using CosmosOdyssey.Domain.Specifications;
+﻿using CosmosOdyssey.Domain.Features.PriceLists;
+using CosmosOdyssey.Domain.Specifications;
 using FluentResults;
 
-namespace CosmosOdyssey.Domain.Features.PriceLists;
+namespace CosmosOdyssey.Domain;
 
 public interface IRepository<T> where T : IEntity
 {

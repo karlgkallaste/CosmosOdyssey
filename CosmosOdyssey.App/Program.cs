@@ -4,7 +4,6 @@ using CosmosOdyssey.App.Features.Reservations.Models;
 using CosmosOdyssey.Data;
 using CosmosOdyssey.Domain;
 using CosmosOdyssey.Services;
-using CosmosOdyssey.Services.PriceListServices;
 using CosmosOdyssey.Services.Services;
 using FluentValidation;
 using Hangfire;
@@ -33,8 +32,8 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowVite", policy =>
     {
         policy.WithOrigins(
-                "http://localhost:5173", 
-                "http://127.0.0.1:5173", 
+                "http://localhost:5173",
+                "http://127.0.0.1:5173",
                 "http://frontend:5173"
             )
             .AllowAnyHeader()
@@ -61,21 +60,20 @@ builder.WebHost.ConfigureKestrel(options =>
 var app = builder.Build();
 app.UseCors("AllowVite");
 app.UseStaticFiles();
-app.UseRouting(); //
+app.UseRouting();
 if (app.Environment.IsDevelopment())
 {
     app.UseOpenApi();
     app.UseSwaggerUI();
 }
 
-app.UseHangfireDashboard();
 app.UseHttpsRedirection();
 
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     dbContext.Database.Migrate();
-    
+
     var priceListService = scope.ServiceProvider.GetRequiredService<IPriceListService>();
     BackgroundJob.Enqueue(() => priceListService.GetLatestPriceList());
     RecurringJob.AddOrUpdate<IPriceListService>("DeleteExcessPriceLists", service => service.DeleteExcess(), "*/30 * * * *" // At every 30th minute

@@ -3,7 +3,7 @@ using CosmosOdyssey.Domain.Features.Legs;
 using CosmosOdyssey.Domain.Features.Routes;
 using Newtonsoft.Json;
 
-namespace CosmosOdyssey.Services.PriceListServices.Models;
+namespace CosmosOdyssey.Services.Services.Models;
 
 public class CompanyResponseModel
 {

@@ -1,4 +1,5 @@
-﻿using CosmosOdyssey.Domain.Features.PriceLists;
+﻿using CosmosOdyssey.Domain;
+using CosmosOdyssey.Domain.Features.PriceLists;
 using CosmosOdyssey.Domain.Specifications;
 using FluentResults;
 using Microsoft.EntityFrameworkCore;

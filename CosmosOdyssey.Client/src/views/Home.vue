@@ -33,6 +33,9 @@ export default defineComponent({
       if (this.from === "" || this.to === "" || this.departDate == undefined){
         return this.$toast.add({severity: 'info', summary: 'Info', detail: "Journey incomplete", life: 3000});
       }
+      if (this.from === this.to){
+        return this.$toast.add({severity: 'error', summary: 'Error', detail: "From and To cannot be the same", life: 3000});
+      }
       this.$router.push({
         name: 'Journey',
         query: {from: this.from, to: this.to, departDate: this.departDate ? this.departDate.toISOString() : undefined},

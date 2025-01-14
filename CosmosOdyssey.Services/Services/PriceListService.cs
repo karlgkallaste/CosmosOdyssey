@@ -1,10 +1,11 @@
 ﻿using System.Net;
 using System.Text.Json;
+using CosmosOdyssey.Domain;
 using CosmosOdyssey.Domain.Features.Legs;
 using CosmosOdyssey.Domain.Features.PriceLists;
 using CosmosOdyssey.Domain.Features.PriceLists.Commands;
 using CosmosOdyssey.Domain.Specifications;
-using CosmosOdyssey.Services.PriceListServices.Models;
+using CosmosOdyssey.Services.Services.Models;
 using FluentResults;
 using Hangfire;
 using MediatR;
@@ -60,7 +61,6 @@ public class PriceListService : IPriceListService
                 nameof(GetLatestPriceList), response.StatusCode, responseContent);
             return Result.Fail("Server error");
         }
-
 
         var modelFromResponse = JsonSerializer.Deserialize<PriceListResponseModel>(responseContent,
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true });

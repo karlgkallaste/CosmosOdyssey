@@ -1,4 +1,5 @@
 ﻿using CosmosOdyssey.App.Features.Legs.Models;
+using CosmosOdyssey.Domain;
 using CosmosOdyssey.Domain.Features.PriceLists;
 using CosmosOdyssey.Domain.Features.PriceLists.Specifications;
 using CosmosOdyssey.Domain.Specifications;
@@ -24,7 +25,7 @@ public class LegController : ControllerBase
     /// An <see cref="IActionResult"/> containing a <see cref="LegListFilterOptionsModel"/> with the available 
     /// companies and locations (200 OK), or a (400 Bad Request) if no valid price list is found.
     /// </returns>
-    [HttpGet("legs/list-filters")]
+    [HttpGet("list-filters")]
     [ProducesResponseType(typeof(LegListFilterOptionsModel), 200)]
     [ProducesResponseType(typeof(ValidationResult), 400)]
     public async Task<IActionResult> ListFilters([FromServices] IRepository<PriceList> priceListRepository)
@@ -70,7 +71,7 @@ public class LegController : ControllerBase
     /// An <see cref="IActionResult"/> containing a list of routes that match the specified filter criteria (200 OK)
     /// or an error response (400 Bad Request) if validation fails or no valid price list is found.
     /// </returns>
-    [HttpGet("legs/")]
+    [HttpGet("")]
     [ProducesResponseType(typeof(RouteListItemModel[]), 200)]
     [ProducesResponseType(typeof(ValidationResult), 400)]
     public async Task<IActionResult> List([FromServices] ILegListItemModelProvider legListProvider, [FromServices] IValidator<ListFiltersModel> validator,
@@ -104,7 +105,7 @@ public class LegController : ControllerBase
     /// An <see cref="IActionResult"/> containing either a list of filtered and sorted providers (200 OK) 
     /// or an error response (400 Bad Request) if the price list or leg is not found or if validation fails.
     /// </returns>
-    [HttpGet("legs/providers")]
+    [HttpGet("providers")]
     [ProducesResponseType(typeof(ProviderInfoModel[]), 200)]
     [ProducesResponseType(typeof(BadRequestObjectResult), 400)]
     public async Task<IActionResult> Providers([FromServices] IRepository<PriceList> priceListRepository, [FromQuery] ProviderListFiltersModel filters)

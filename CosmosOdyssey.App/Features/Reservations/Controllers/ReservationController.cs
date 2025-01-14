@@ -1,6 +1,7 @@
 ﻿using System.Collections.Immutable;
 using CosmosOdyssey.App.Features.Reservations.Models;
 using CosmosOdyssey.App.Features.Reservations.Requests;
+using CosmosOdyssey.Domain;
 using CosmosOdyssey.Domain.Features.PriceLists;
 using CosmosOdyssey.Domain.Features.Reservations;
 using CosmosOdyssey.Domain.Features.Reservations.Commands;
@@ -29,7 +30,7 @@ public class ReservationController : ControllerBase
     /// - A 200 OK response with the created reservation's unique ID on success.
     /// - A 400 Bad Request response with validation or command errors on failure.
     /// </returns>
-    [HttpPost("/reservations")]
+    [HttpPost("")]
     [ProducesResponseType(typeof(Guid), 200)]
     [ProducesResponseType(typeof(ValidationResult), 400)]
     public async Task<IActionResult> Create([FromServices] IMediator mediator,
@@ -62,7 +63,7 @@ public class ReservationController : ControllerBase
     /// - A 200 OK response with a list of reservations matching the filter criteria.
     /// - A 400 Bad Request response if an error occurs during the process.
     /// </returns>
-    [HttpGet("/reservations")]
+    [HttpGet("")]
     [ProducesResponseType(typeof(ReservationListItemModel[]), 200)]
     [ProducesResponseType(typeof(BadRequest), 400)]
     public async Task<IActionResult> List([FromQuery] string lastName,
@@ -85,7 +86,7 @@ public class ReservationController : ControllerBase
     /// - A 404 Not Found response if the reservation does not exist.
     /// - A 400 Bad Request response if an error occurs during the process.
     /// </returns>
-    [HttpGet("/reservations/{id}")]
+    [HttpGet("{id}")]
     [ProducesResponseType(typeof(ReservationDetailsModel), 200)]
     [ProducesResponseType(typeof(BadRequest), 400)]
     [ProducesResponseType(typeof(NotFound), 404)]

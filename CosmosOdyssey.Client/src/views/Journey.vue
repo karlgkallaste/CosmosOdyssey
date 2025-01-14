@@ -46,8 +46,8 @@ export default defineComponent({
             this.$toast.add({
               severity: 'error',
               summary: 'Validation Error',
-              detail: error.errorMessage, // Display each error message in the toast
-              life: 3000, // Toast duration
+              detail: error.errorMessage,
+              life: 3000,
             });
           });
         } else {
