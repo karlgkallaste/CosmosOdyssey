@@ -10,12 +10,18 @@
     "resolveJsonModule": true,
     "jsx": "preserve",
     "allowSyntheticDefaultImports": true,
-    "allowImportingTsExtensions": true
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "types": ["vite/client", "node"]
   },
   "include": [
     "src/**/*.ts",
     "src/**/*.d.ts",
     "src/**/*.tsx",
-    "src/**/*.vue"  // Ensure this is included
+    "src/**/*.vue"
+  ],
+  "exclude": [
+    "src/apiClients.generated.ts",
+    "node_modules"
   ]
 }

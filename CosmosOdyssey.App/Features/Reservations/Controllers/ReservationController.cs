@@ -17,7 +17,19 @@ namespace CosmosOdyssey.App.Features.Reservations.Controllers;
 [Route("[controller]")]
 public class ReservationController : ControllerBase
 {
-    [HttpPost("create")]
+    /// <summary>
+    /// Creates a new reservation based on the provided request data.
+    /// Validates the request and processes the reservation creation command.
+    /// </summary>
+    /// <param name="mediator">The mediator used to send the reservation creation command.</param>
+    /// <param name="validator">The validator to ensure the request data is valid.</param>
+    /// <param name="request">The reservation creation request containing required data.</param>
+    /// <returns>
+    /// An <see cref="IActionResult"/> containing:
+    /// - A 200 OK response with the created reservation's unique ID on success.
+    /// - A 400 Bad Request response with validation or command errors on failure.
+    /// </returns>
+    [HttpPost("/reservations")]
     [ProducesResponseType(typeof(Guid), 200)]
     [ProducesResponseType(typeof(ValidationResult), 400)]
     public async Task<IActionResult> Create([FromServices] IMediator mediator,
@@ -40,8 +52,17 @@ public class ReservationController : ControllerBase
         return Ok(commandResult.Value);
     }
 
-
-    [HttpPost("list")]
+    /// <summary>
+    /// Retrieves a list of reservations filtered by the customer's last name.
+    /// </summary>
+    /// <param name="lastName">The last name of the customer to filter reservations.</param>
+    /// <param name="reservationRepository">The repository used to query reservations.</param>
+    /// <returns>
+    /// An <see cref="IActionResult"/> containing:
+    /// - A 200 OK response with a list of reservations matching the filter criteria.
+    /// - A 400 Bad Request response if an error occurs during the process.
+    /// </returns>
+    [HttpGet("/reservations")]
     [ProducesResponseType(typeof(ReservationListItemModel[]), 200)]
     [ProducesResponseType(typeof(BadRequest), 400)]
     public async Task<IActionResult> List([FromQuery] string lastName,
@@ -52,9 +73,22 @@ public class ReservationController : ControllerBase
         return Ok(reservations.Select(x => new ReservationListItemModel(x)));
     }
 
-    [HttpPost("{id}")]
+    /// <summary>
+    /// Retrieves detailed information about a specific reservation by its unique identifier.
+    /// </summary>
+    /// <param name="id">The unique identifier of the reservation to retrieve.</param>
+    /// <param name="reservationRepository">The repository used to access reservation data.</param>
+    /// <param name="reservationProvider">A service that transforms the reservation into a detailed model.</param>
+    /// <returns>
+    /// An <see cref="IActionResult"/> containing:
+    /// - A 200 OK response with the detailed reservation data if found.
+    /// - A 404 Not Found response if the reservation does not exist.
+    /// - A 400 Bad Request response if an error occurs during the process.
+    /// </returns>
+    [HttpGet("/reservations/{id}")]
     [ProducesResponseType(typeof(ReservationDetailsModel), 200)]
     [ProducesResponseType(typeof(BadRequest), 400)]
+    [ProducesResponseType(typeof(NotFound), 404)]
     public async Task<IActionResult> Get(Guid id, [FromServices] IRepository<Reservation> reservationRepository,
         [FromServices] IReservationProvider reservationProvider)
     {

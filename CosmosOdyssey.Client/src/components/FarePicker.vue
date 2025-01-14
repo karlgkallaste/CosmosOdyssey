@@ -1,5 +1,6 @@
 ﻿<script lang="ts">
 import {defineComponent, type PropType} from 'vue'
+// @ts-ignore
 import {api} from "../../apiClients.generated.ts";
 import LocationModel = api.LocationModel;
 

@@ -1,18 +1,14 @@
 ﻿using CosmosOdyssey.App.Features.Legs.Models;
-using CosmosOdyssey.Domain.Features.Legs;
 using CosmosOdyssey.Domain.Features.PriceLists;
 using CosmosOdyssey.Domain.Features.PriceLists.Specifications;
 using CosmosOdyssey.Domain.Specifications;
 using FluentResults;
 using FluentValidation;
-using FluentValidation.AspNetCore;
 using FluentValidation.Results;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CosmosOdyssey.App.Features.Legs.Controllers;
 
-//TODO: RENAME LEGS -> ROUTES
 [ApiController]
 [Route("[controller]")]
 public class LegController : ControllerBase
@@ -26,17 +22,17 @@ public class LegController : ControllerBase
     /// </param>
     /// <returns>
     /// An <see cref="IActionResult"/> containing a <see cref="LegListFilterOptionsModel"/> with the available 
-    /// companies and locations (200 OK), or a 400 Bad Request if no valid price list is found.
+    /// companies and locations (200 OK), or a (400 Bad Request) if no valid price list is found.
     /// </returns>
-    [HttpGet("list-filters")]
+    [HttpGet("legs/list-filters")]
     [ProducesResponseType(typeof(LegListFilterOptionsModel), 200)]
-    [ProducesResponseType(typeof(BadRequest), 400)]
+    [ProducesResponseType(typeof(ValidationResult), 400)]
     public async Task<IActionResult> ListFilters([FromServices] IRepository<PriceList> priceListRepository)
     {
-        var validPriceLists = await priceListRepository.FindAsync(new ValidUntilNotPassed(DateTime.Now.AddDays(-1)));
+        var validPriceLists = await priceListRepository.FindAsync(new ValidUntilNotPassed(DateTime.Now));
         if (validPriceLists is null)
         {
-            return BadRequest();
+            return BadRequest(Result.Fail("Latest prices are not found"));
         }
 
         var lastPriceList = validPriceLists.OrderBy(x => x.ValidUntil).First();
@@ -74,43 +70,49 @@ public class LegController : ControllerBase
     /// An <see cref="IActionResult"/> containing a list of routes that match the specified filter criteria (200 OK)
     /// or an error response (400 Bad Request) if validation fails or no valid price list is found.
     /// </returns>
-    [HttpGet("list")]
+    [HttpGet("legs/")]
     [ProducesResponseType(typeof(RouteListItemModel[]), 200)]
     [ProducesResponseType(typeof(ValidationResult), 400)]
-    public async Task<IActionResult> Legs([FromServices] ILegListItemModelProvider legListProvider,
-        [FromServices] IValidator<ListFiltersModel> validator,
+    public async Task<IActionResult> List([FromServices] ILegListItemModelProvider legListProvider, [FromServices] IValidator<ListFiltersModel> validator,
         [FromServices] IRepository<PriceList> priceListRepository,
         [FromQuery] ListFiltersModel filters)
     {
-        
-        
-        var validPriceLists = await priceListRepository.FindAsync(new ValidUntilNotPassed(DateTime.Now.AddDays(-1)));
+        var validPriceLists = await priceListRepository.FindAsync(new ValidUntilNotPassed(DateTime.Now));
         if (validPriceLists is null)
         {
-            return BadRequest(new ValidationResult());
+            return BadRequest(Result.Fail("Latest prices are not found"));
         }
+
+        var lastPriceList = validPriceLists.OrderBy(x => x.ValidUntil).First();
 
         var validationResult = await validator.ValidateAsync(filters);
         if (!validationResult.IsValid)
         {
             return BadRequest(validationResult.Errors);
         }
-        
-        var lastPriceList = validPriceLists.OrderBy(x => x.ValidUntil).First();
 
         return Ok(legListProvider.Provide(lastPriceList, filters));
     }
 
-    [HttpGet("filter-providers")]
+    /// <summary>
+    /// Retrieves a list of providers for a specific leg (route) based on the provided filters.
+    /// The method checks the existence of a valid price list and a valid leg before filtering and sorting the providers.
+    /// </summary>
+    /// <param name="priceListRepository">The repository used to retrieve price lists from the data source.</param>
+    /// <param name="filters">The filter criteria that will be applied to retrieve and sort the providers.</param>
+    /// <returns>
+    /// An <see cref="IActionResult"/> containing either a list of filtered and sorted providers (200 OK) 
+    /// or an error response (400 Bad Request) if the price list or leg is not found or if validation fails.
+    /// </returns>
+    [HttpGet("legs/providers")]
     [ProducesResponseType(typeof(ProviderInfoModel[]), 200)]
     [ProducesResponseType(typeof(BadRequestObjectResult), 400)]
-    public async Task<IActionResult> LegProvidersList([FromServices] IRepository<PriceList> priceListRepository,
-        [FromQuery] ProviderListFiltersModel filters)
+    public async Task<IActionResult> Providers([FromServices] IRepository<PriceList> priceListRepository, [FromQuery] ProviderListFiltersModel filters)
     {
         var priceList = await priceListRepository.FindAsync(new WithAnyGivenId<PriceList>(filters.PriceListId));
         if (priceList is null)
         {
-            return BadRequest();
+            return BadRequest(Result.Fail("Latest prices are not found"));
         }
 
         var leg = priceList
@@ -119,7 +121,7 @@ public class LegController : ControllerBase
 
         if (leg is null)
         {
-            return BadRequest();
+            return BadRequest(Result.Fail("Leg not found"));
         }
 
         var specification = filters.ToSpecification();
@@ -143,9 +145,5 @@ public class LegController : ControllerBase
             FlightStart = x.FlightStart,
             FlightEnd = x.FlightEnd
         }));
-    }
-
-    public class SearchFiltersModel
-    {
     }
 }

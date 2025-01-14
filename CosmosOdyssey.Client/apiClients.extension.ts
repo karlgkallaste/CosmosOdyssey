@@ -1,3 +1,4 @@
+/// <reference types="vite/client" />
 export class ClientBase {
     private _handleGlobalConflict = true;
 
@@ -6,7 +7,8 @@ export class ClientBase {
     }
 
     getBaseUrl(defaultUrl: string, baseUrl?: string) {
-        return "https://localhost:7299";
+        const apiUrl = import.meta.env.VITE_API_BASE_URL;
+        return apiUrl;
     }
 
     protected transformOptions(options: any) {

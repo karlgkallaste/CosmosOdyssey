@@ -26,7 +26,7 @@ export default defineComponent({
   },
   methods: {
     fetchProviders(filters: SearchFiltersModel) {
-      new api.LegClient().legProvidersList(this.legId, this.priceListId, filters.priceBelow, filters.arriveBy, filters.companyName, filters.sortBy).then(x => {
+      new api.LegClient().providers(this.legId, this.priceListId, filters.priceBelow, filters.arriveBy, filters.companyName, filters.sortBy).then(x => {
         this.providers = x;
       })
     },

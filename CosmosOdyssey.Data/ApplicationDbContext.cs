@@ -80,7 +80,7 @@ public class ApplicationDbContextFactory : IDesignTimeDbContextFactory<Applicati
     public ApplicationDbContext CreateDbContext(string[] args)
     {
         var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
-        optionsBuilder.UseNpgsql("Host=localhost;Database=cosmos_odyssey;Username=cosmos;Password=odyssey");
+        optionsBuilder.UseNpgsql("Host=db;Database=cosmos_odyssey;Username=cosmos;Password=odyssey");
 
         return new ApplicationDbContext(optionsBuilder.Options);
     }

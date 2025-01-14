@@ -1,6 +1,7 @@
 ﻿<script lang="ts">
 import {defineComponent} from 'vue'
 import FarePicker from "../components/FarePicker.vue";
+// @ts-ignore
 import {api} from "../../apiClients.generated.ts";
 import LegListFilterOptionsModel = api.LegListFilterOptionsModel;
 

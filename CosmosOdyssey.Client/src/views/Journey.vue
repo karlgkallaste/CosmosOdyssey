@@ -4,10 +4,6 @@ import {api} from "../../apiClients.generated";
 import RouteList from "../components/RouteList.vue";
 import ReservationTab from "../components/ReservationTab.vue";
 
-interface ValidationErrorResponse {
-  status: number;
-  response: { errorMessage: string }[]; // An array of error objects with an errorMessage field
-}
 
 export default defineComponent({
   name: "Journey",
@@ -67,7 +63,7 @@ export default defineComponent({
 <template>
   <div class="flex flex-col sm:flex-row gap-4">
     <div class="flex-1 p-4 bg-gray-100 rounded-lg shadow-md">
-      <route-list @create-reservation="(selectedRoute, priceListId) => setRouteInfo(selectedRoute, priceListId)"
+      <route-list @create-reservation="(selectedRoute, id) => setRouteInfo(selectedRoute, id)"
                   :to="to" :from="from"
                   :depart-date="departDate.toISOString()"></route-list>
     </div>

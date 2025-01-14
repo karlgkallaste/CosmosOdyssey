@@ -1,5 +1,6 @@
 <script lang="ts">
 import {defineComponent, PropType} from 'vue'
+// @ts-ignore
 import {api} from "../../apiClients.generated.ts";
 
 export default defineComponent({
