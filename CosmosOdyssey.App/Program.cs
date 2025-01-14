@@ -59,21 +59,20 @@ builder.WebHost.ConfigureKestrel(options =>
 
 var app = builder.Build();
 app.UseCors("AllowVite");
-app.UseStaticFiles();
-app.UseRouting();
 if (app.Environment.IsDevelopment())
 {
     app.UseOpenApi();
     app.UseSwaggerUI();
 }
 
+app.UseHangfireDashboard();
 app.UseHttpsRedirection();
 
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     dbContext.Database.Migrate();
-
+    
     var priceListService = scope.ServiceProvider.GetRequiredService<IPriceListService>();
     BackgroundJob.Enqueue(() => priceListService.GetLatestPriceList());
     RecurringJob.AddOrUpdate<IPriceListService>("DeleteExcessPriceLists", service => service.DeleteExcess(), "*/30 * * * *" // At every 30th minute
