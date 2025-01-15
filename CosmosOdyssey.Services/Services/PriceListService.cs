@@ -71,6 +71,16 @@ public class PriceListService : IPriceListService
                 responseContent);
             return Result.Fail("Failed to deserialize");
         }
+        
+        
+        var existingPriceList = await _priceListRepository.GetByIdAsync(modelFromResponse.Id);
+
+        if (existingPriceList != null)
+        {
+            _logger.LogError("[{Name}] Tried to create duplicate price list {Id}", nameof(GetLatestPriceList),
+                modelFromResponse.Id);
+            return Result.Fail("Price List already exists");
+        }
 
         var priceListLegs = modelFromResponse.Legs.Select(x => _priceListLegBuilder
                 .WithId(x.Id)
@@ -85,15 +95,6 @@ public class PriceListService : IPriceListService
             .WithValidUntil(modelFromResponse.ValidUntil)
             .WithLegs(priceListLegs)
             .Build();
-
-        var existingPriceList = await _priceListRepository.GetByIdAsync(modelFromResponse.Id);
-
-        if (existingPriceList != null)
-        {
-            _logger.LogError("[{Name}] Tried to create duplicate price list {Id}", nameof(GetLatestPriceList),
-                modelFromResponse.Id);
-            return Result.Fail("Price List already exists");
-        }
 
         var result = await _mediator.Send(new CreatePriceListCommand(priceList));
         if (result.IsFailed) throw new Exception("Failed to create price list");
